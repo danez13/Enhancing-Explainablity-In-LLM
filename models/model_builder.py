@@ -109,7 +109,7 @@ class CNN_MODEL(torch.nn.Module):
         self.n_labels = n_labels
         embedding_dim = 300
         dropout = 0.05
-        embedding_dir = "../glove/"
+        embedding_dir = "./glove/"
         in_channels = 1
         out_channels = 100
         kernel_heights = [4,5,6,7]
