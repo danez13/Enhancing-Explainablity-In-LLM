@@ -140,7 +140,7 @@ def generate_saliency(model_path, saliency_path, dataset_dir, labels):
 
 
 seed = 73
-model_path = "models/snli/cnn/cnn"
+models_path = "models/snli/cnn/cnn"
 output_dir = "data/saliency/snli/cnn/"
 dataset_dir = "data/e-SNLI/dataset"
 labels = 3
@@ -155,7 +155,7 @@ device = torch.device("cuda")
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 for model in range (1,6):
-    model_path = model_path + f"_{model}"
+    model_path = models_path + f"_{model}"
     print(model_path, flush=True)
     all_flops = generate_saliency(model_path, 
                                 os.path.join(output_dir, 
