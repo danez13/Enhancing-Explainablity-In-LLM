@@ -1,0 +1,20 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: linux-64
+captum
+lime
+matplotlib
+nltk
+numpy==1.26.4
+scikit-image
+scikit-learn
+scipy
+sentencepiece
+tokenizers
+torchvision
+tqdm
+transformers
+pandas
+fastparquet
+torch==2.3.1+cu121
+-f https://download.pytorch.org/whl/torch_stable.html
