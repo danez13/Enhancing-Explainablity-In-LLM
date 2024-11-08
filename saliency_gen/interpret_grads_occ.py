@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import BertTokenizer
 
-from models.data_loader import collate_nli, get_dataset
+from models.data_loader import collate_nli, NLIDataset
 from models.model_builder import CNN_MODEL
 
 
@@ -47,7 +47,7 @@ def get_model_embedding_emb(model):
     return model.embedding.embedding
 
 
-def generate_saliency(model_path, saliency_path, saliency, aggregation, dataset_dir, split, bs, dataset, sw):
+def generate_saliency(model_path, saliency_path, saliency, aggregation, dataset_dir, bs, sw):
     checkpoint = torch.load(model_path,
                             map_location=lambda storage, loc: storage)
     model_args = Namespace(**checkpoint['args'])
@@ -72,8 +72,7 @@ def generate_saliency(model_path, saliency_path, saliency, aggregation, dataset_
     collate_fn = partial(collate_nli, tokenizer=tokenizer, device=device,
                          return_attention_masks=False,
                          pad_to_max_length=pad_to_max)
-    test = get_dataset(path=dataset_dir, mode=split,
-                       dataset=dataset)
+    test = NLIDataset(dataset_dir, type="test", salient_features=True)
     batch_size = bs if bs != None else \
         model_args.batch_size
     test_dl = DataLoader(batch_size=batch_size, dataset=test, shuffle=False,
@@ -155,9 +154,7 @@ saliency = ["guided","sal","inputx","occlusion"]
 model_dir = "data/models/snli/cnn/cnn"
 output_dir = "data\saliency\snli\cnn"
 dataset_dir = "data/e-SNLI/dataset"
-split = "test"
 batch_size = None
-dataset = "snli"
 sliding_window = 1
 random.seed(seed)
 torch.manual_seed(seed)
@@ -188,10 +185,9 @@ for saliency in saliency:
                 os.path.join(models_dir + f'_{model}'),
                 os.path.join(output_dir, f'{base_model_name}_{model}_{saliency}_{aggregation}'), 
                 saliency, 
-                aggregation, dataset_dir, 
-                split, 
+                aggregation, 
+                dataset_dir, 
                 batch_size, 
-                dataset, 
                 sliding_window)
 
             flops.append(np.average(curr_flops))

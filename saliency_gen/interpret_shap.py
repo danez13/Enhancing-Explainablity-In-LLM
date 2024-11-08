@@ -13,14 +13,13 @@ import torch
 from captum.attr import ShapleyValueSampling
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import BertConfig, BertForSequenceClassification, \
-    BertTokenizer
+from transformers import BertTokenizer
 
 from models.data_loader import NLIDataset,collate_nli
-from models.model_builder import CNN_MODEL, LSTM_MODEL
+from models.model_builder import CNN_MODEL
 
 
-def generate_saliency(model_path, saliency_path, batch_size, dataset_path, split, labels):
+def generate_saliency(model_path, saliency_path, batch_size, dataset_dir, split, labels):
     checkpoint = torch.load(model_path,
                             map_location=lambda storage, loc: storage)
     model_args = Namespace(**checkpoint['args'])
@@ -109,7 +108,7 @@ class BertModelWrapper(torch.nn.Module):
         return self.model(input.long(), attention_mask=input > 0)[0]
 
 seed = 73
-model_path = "models/snli/cnn/cnn"
+models_path = "models/snli/cnn/cnn"
 output_dir = "data/saliency/snli/cnn/"
 dataset_dir = "data/e-SNLI/dataset"
 labels = 3
@@ -126,14 +125,15 @@ device = torch.device("cuda")
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-model_path = model_path
-model_name = model_path.split('/')[-1]
+for model in range(1,6):
+    model_path = models_path+f"_{model}"
+    model_name = model_path.split('/')[-1]
 
-all_flops = generate_saliency(model_path, os.path.join(output_dir,
-                                                        f'{model_name}_shap'),
-                                                        batch_size,
-                                                        dataset_dir,
-                                                        split,
-                                                        labels)
+    all_flops = generate_saliency(model_path, os.path.join(output_dir,
+                                                            f'{model_name}_shap'),
+                                                            batch_size,
+                                                            dataset_dir,
+                                                            split,
+                                                            labels)
 
 print('FLOPS', np.average(all_flops), np.std(all_flops), flush=True)
