@@ -15,15 +15,14 @@ from tqdm import tqdm
 from transformers import BertTokenizer
 
 from data_loader import BucketBatchSampler, NLIDataset, collate_nli
-from model_builder import CNN_MODEL, EarlyStopping
+from model_builder import CNN_MODEL
 
 
 def train_model(model: torch.nn.Module,
                 train_dl: BatchSampler, dev_dl: BatchSampler,
                 optimizer: torch.optim.Optimizer,
                 scheduler: torch.optim.lr_scheduler.LambdaLR,
-                n_epochs: int,
-                early_stopping: EarlyStopping) -> (Dict, Dict):
+                n_epochs: int) -> (Dict, Dict):
     loss_f = torch.nn.CrossEntropyLoss()
 
     best_val, best_model_weights = {'val_f1': 0}, None
@@ -50,9 +49,6 @@ def train_model(model: torch.nn.Module,
             best_model_weights = model.state_dict()
 
         scheduler.step(val_loss)
-        if early_stopping.step(val_f1):
-            print('Early stopping...')
-            break
 
     return best_model_weights, best_val
 
@@ -123,10 +119,8 @@ for i in range(1,6):
     print(model)
     optimizer = AdamW(model.parameters(), lr=lr)
     scheduler = ReduceLROnPlateau(optimizer)
-    es = EarlyStopping(patience=patience, percentage=False, mode='max',
-                    min_delta=0.0)
 
-    best_model_w, best_perf = train_model(model, train_dl, dev_dl, optimizer, scheduler, epochs, es)
+    best_model_w, best_perf = train_model(model, train_dl, dev_dl, optimizer, scheduler, epochs)
 
     checkpoint = {
     'performance': best_perf,
