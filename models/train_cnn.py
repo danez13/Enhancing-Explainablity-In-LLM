@@ -135,7 +135,7 @@ for i in range(1,6):
     optimizer = AdamW(model.parameters(), lr=args["lr"])
     scheduler = ReduceLROnPlateau(optimizer)
 
-    best_model_w, best_perf = train_model(model, train_dl, dev_dl, optimizer, scheduler, args["epochs"], es)
+    best_model_w, best_perf = train_model(model, train_dl, dev_dl, optimizer, scheduler, args["epochs"])
 
     checkpoint = {
     'performance': best_perf,
