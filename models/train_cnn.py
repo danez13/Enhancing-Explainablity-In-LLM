@@ -86,51 +86,63 @@ def eval_model(model: torch.nn.Module, test_dl: BucketBatchSampler,
     return p, r, f1, np.mean(losses), labels_all, prediction
 
 for i in range(1,6):
-    dataset_dir = "data/e-SNLI/dataset"
-    batch_size = 256
-    lr = 0.0001
-    patience = 5
-    epochs = 100
-    seed = 73
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
+    args = {
+    "gpu":False,
+    "seed":73,
+    "labels":3,
+    "dataset_dir":"data/e-SNLI/dataset",
+    "model_path": "data/models/snli/cnn/cnn",
+    "batch_size": 256,
+    "lr":0.001,
+    "epochs":100,
+    "mode": "test",
+    "patience": 5,
+    "model": "cnn",
+    "embedding_dir": "./glove/",
+    "dropout":0.01,
+    "embedding_dim":100,
+    "in_channels":1,
+    "out_channels": 100,
+    "kernel_heights": [2,3,4,5],
+    "stride":1,
+    "padding":0
+    }
+
+    random.seed(args["seed"])
+    np.random.seed(args["seed"])
+    torch.manual_seed(args["seed"])
+    torch.cuda.manual_seed_all(args["seed"])
     torch.backends.cudnn.deterministic = True
-    device = torch.device("cuda")
+    device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     collate_fn = partial(collate_nli, tokenizer=tokenizer, device=device,
                         return_attention_masks=False, pad_to_max_length=False)
     sort_key = lambda x: len(x[0]) + len(x[1])
-
-    model = CNN_MODEL(tokenizer, n_labels=3).to(device)
+    model = CNN_MODEL(tokenizer, args, n_labels=3).to(device)
 
     print("Loading datasets...")
-    train = NLIDataset(dataset_dir, type='train')
-    dev = NLIDataset(dataset_dir, type='dev')
+    train = NLIDataset(args["dataset_dir"], type='train')
+    dev = NLIDataset(args["dataset_dir"], type='dev')
 
-    train_dl = BucketBatchSampler(batch_size=batch_size,
+    train_dl = BucketBatchSampler(batch_size=args["batch_size"],
                                 sort_key=sort_key, dataset=train,
                                 collate_fn=collate_fn)
-    dev_dl = BucketBatchSampler(batch_size=batch_size,
+    dev_dl = BucketBatchSampler(batch_size=args["batch_size"],
                             sort_key=sort_key, dataset=dev,
                             collate_fn=collate_fn)
 
     print(model)
-    optimizer = AdamW(model.parameters(), lr=lr)
+    optimizer = AdamW(model.parameters(), lr=args["lr"])
     scheduler = ReduceLROnPlateau(optimizer)
 
-    best_model_w, best_perf = train_model(model, train_dl, dev_dl, optimizer, scheduler, epochs)
+    best_model_w, best_perf = train_model(model, train_dl, dev_dl, optimizer, scheduler, args["epochs"], es)
 
     checkpoint = {
     'performance': best_perf,
-    'batch size': batch_size, 
-    'learning rate': lr, 
-    'patience': patience, 
-    'epochs': epochs,
+    'args':args,
     'model': best_model_w,
     }
     print(best_perf)
-    print(f"{batch_size}, {lr}, {patience}, {epochs}")
+    print(args)
 
     torch.save(checkpoint, f"data/models/snli/cnn/cnn_{i}")
