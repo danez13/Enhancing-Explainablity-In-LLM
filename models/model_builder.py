@@ -104,29 +104,22 @@ def get_embeddings(embedding_dim: int, embedding_dir: str,
                               requires_grad=True)
 
 class CNN_MODEL(torch.nn.Module):
-    def __init__(self, tokenizer: PreTrainedTokenizer, n_labels: int = 2):
+    def __init__(self, tokenizer: PreTrainedTokenizer, args: dict, n_labels: int = 2):
         super().__init__()
         self.n_labels = n_labels
-        embedding_dim = 300
-        dropout = 0.05
-        embedding_dir = "./glove/"
-        in_channels = 1
-        out_channels = 100
-        kernel_heights = [4,5,6,7]
-        stride = 1
-        padding = 0
+        self.args = args
 
-        self.embedding = torch.nn.Embedding(len(tokenizer), embedding_dim)
+        self.embedding = torch.nn.Embedding(len(tokenizer), args["embedding_dim"])
 
-        self.dropout = torch.nn.Dropout(dropout)
+        self.dropout = torch.nn.Dropout(args["dropout"])
 
-        self.embedding.weight = get_embeddings(embedding_dim, embedding_dir, tokenizer)
+        self.embedding.weight = get_embeddings(args["embedding_dim"], args["embedding_dir"], tokenizer)
 
         self.conv_layers = torch.nn.ModuleList(
-            [torch.nn.Conv2d(in_channels, out_channels,(kernel_height, embedding_dim),stride, padding) for kernel_height in kernel_heights])
+            [torch.nn.Conv2d(args["in_channels"], args["out_channels"],(kernel_height, args["embedding_dim"]), args["stride"], args["padding"]) for kernel_height in args["kernel_heights"]])
 
         self.final = torch.nn.Linear(
-            len(kernel_heights) * out_channels, n_labels)
+            len(args["kernel_heights"]) * args["out_channels"], n_labels)
 
     def conv_block(self, input, conv_layer):
         conv_out = conv_layer(input)
