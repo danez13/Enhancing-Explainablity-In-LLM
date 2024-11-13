@@ -95,19 +95,19 @@ for i in range(1,6):
     "seed":73,
     "labels":3,
     "dataset_dir":"data/e-SNLI/dataset",
-    "model_path": "data/models/snli/cnn/cnn",
+    "model_path": f"data/models/snli/cnn/cnn_{i}",
     "batch_size": 256,
-    "lr":0.001,
+    "lr":0.0001,
     "epochs":100,
     "mode": "test",
     "patience": 5,
     "model": "cnn",
     "embedding_dir": "./glove/",
-    "dropout":0.01,
-    "embedding_dim":100,
+    "dropout":0.05,
+    "embedding_dim":300,
     "in_channels":1,
-    "out_channels": 100,
-    "kernel_heights": [2,3,4,5],
+    "out_channels": 300,
+    "kernel_heights": [4,5,6,7],
     "stride":1,
     "padding":0
     }
@@ -151,4 +151,4 @@ for i in range(1,6):
     print(best_perf)
     print(args)
 
-    torch.save(checkpoint, f"data/models/snli/cnn/cnn_{i}")
+    torch.save(checkpoint, args["model_path"])
