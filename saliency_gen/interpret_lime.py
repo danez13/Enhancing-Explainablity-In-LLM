@@ -139,18 +139,26 @@ def generate_saliency(model_path, saliency_path, dataset_dir, labels):
     return saliency_flops
 
 
-seed = 73
-models_path = "models/snli/cnn/cnn"
-output_dir = "data/saliency/snli/cnn/"
-dataset_dir = "data/e-SNLI/dataset"
-labels = 3
-random.seed(seed)
-torch.manual_seed(seed)
-torch.cuda.manual_seed_all(seed)
+args = {
+    "dataset": "snli",
+    "dataset_dir": "data/e-SNLI/dataset/",
+    "split": "test",
+    "model": "cnn",
+    "models_dir": "data/models/snli/cnn/cnn",
+    "gpu": False,
+    "seed": 73,
+    "output_dir": "data/saliency/tweet/cnn/",
+    "sw": 1,
+    "saliency": ["guided","sal","inputx","occlusion"],
+    "batch_size": None
+}
+random.seed(args["seed"])
+torch.manual_seed(args["seed"])
+torch.cuda.manual_seed_all(args["seed"])
 torch.backends.cudnn.deterministic = True
-np.random.seed(seed)
+np.random.seed(args["seed"])
 
-device = torch.device("cuda")
+device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
