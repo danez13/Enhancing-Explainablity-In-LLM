@@ -16,5 +16,5 @@ tqdm
 transformers
 pandas
 fastparquet
-torch==2.3.1+cu121
+torch==2.1.0+cu121
 -f https://download.pytorch.org/whl/torch_stable.html
