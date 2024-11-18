@@ -11,7 +11,6 @@ from torch.utils.data import Dataset
 from torch.utils.data.sampler import BatchSampler, RandomSampler, Sampler, \
     SequentialSampler, SubsetRandomSampler
 from transformers import PreTrainedTokenizer
-
 _NLI_DIC_LABELS = {'entailment': 2, 'neutral': 1, 'contradiction': 0}
 
 def identity(x):
@@ -22,7 +21,7 @@ def collate_nli(instances: List[Dict],
                 return_attention_masks: bool = True,
                 pad_to_max_length: bool = False,
                 device='cuda') -> List[torch.Tensor]:
-    token_ids = [tokenizer.encode(_x[0], _x[1], max_length=509) for _x in
+    token_ids = [tokenizer.encode(_x[0], _x[1], max_length=509,truncation=True) for _x in
                  instances]
     if pad_to_max_length:
         batch_max_len = 512
