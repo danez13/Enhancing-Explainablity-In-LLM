@@ -149,8 +149,7 @@ args = {
     "gpu_id":0,
     "seed": 73,
     "output_dir": "data/saliency/snli/cnn/",
-    "labels":3,
-    "saliency": ["guided","sal","inputx","occlusion"],
+    "labels":3
 }
 random.seed(args["seed"])
 torch.manual_seed(args["seed"])

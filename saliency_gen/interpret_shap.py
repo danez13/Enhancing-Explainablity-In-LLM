@@ -68,7 +68,7 @@ def generate_saliency(model_path, saliency_path,args):
 
             token_ids = batch[0].detach().cpu().numpy().tolist()
 
-            for cls_ in range(["labels"]):
+            for cls_ in range(args["labels"]):
                 attributions = ablator.attribute(batch[0].float(), target=cls_,
                                                  additional_forward_args=additional)
                 attributions = attributions.detach().cpu().numpy().tolist()
