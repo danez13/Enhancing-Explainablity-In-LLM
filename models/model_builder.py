@@ -8,7 +8,6 @@ from torch.nn import functional as F, init
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from tqdm import tqdm
 from transformers import PreTrainedTokenizer
-
 _glove_path = "glove.6B.{}d.txt".format
 
 

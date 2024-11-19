@@ -17,6 +17,8 @@ from transformers import BertTokenizer
 from data_loader import BucketBatchSampler, NLIDataset, collate_nli
 from model_builder import CNN_MODEL
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="torch.utils.data.sampler")
 
 def train_model(model: torch.nn.Module,
                 train_dl: BatchSampler, dev_dl: BatchSampler,

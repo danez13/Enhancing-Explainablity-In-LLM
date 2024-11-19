@@ -47,11 +47,10 @@ def get_model_embedding_emb(model):
     return model.embedding.embedding
 
 
-def generate_saliency(model_path, saliency_path, saliency, aggregation, dataset_dir, bs, sw):
+def generate_saliency(model_path, saliency_path, saliency, aggregation):
     checkpoint = torch.load(model_path,
                             map_location=lambda storage, loc: storage)
-    model_args = Namespace(**checkpoint['args'])
-
+    model_args = checkpoint['args']
     model = CNN_MODEL(tokenizer, model_args, n_labels=checkpoint['args']['labels']).to(device)
     model.load_state_dict(checkpoint['model'])
 
@@ -72,9 +71,9 @@ def generate_saliency(model_path, saliency_path, saliency, aggregation, dataset_
     collate_fn = partial(collate_nli, tokenizer=tokenizer, device=device,
                          return_attention_masks=False,
                          pad_to_max_length=pad_to_max)
-    test = NLIDataset(dataset_dir, type="test", salient_features=True)
-    batch_size = bs if bs != None else \
-        model_args.batch_size
+    test = NLIDataset(args["dataset_dir"], type=args["split"], salient_features=True)
+    batch_size = args["batch_size"] if args["batch_size"] != None else \
+        model_args['batch_size']
     test_dl = DataLoader(batch_size=batch_size, dataset=test, shuffle=False,
                          collate_fn=collate_fn)
 
@@ -114,7 +113,7 @@ def generate_saliency(model_path, saliency_path, saliency, aggregation, dataset_
             if saliency == 'occlusion':
                 attributions = ablator.attribute(batch[0],
                                                  sliding_window_shapes=(
-                                                 sw,), target=cls_,
+                                                 args["sw"],), target=cls_,
                                                  additional_forward_args=additional)
             else:
                 attributions = ablator.attribute(input_embeddings, target=cls_,
@@ -149,24 +148,31 @@ def generate_saliency(model_path, saliency_path, saliency, aggregation, dataset_
 
     return saliency_flops
 
-seed = 73
-saliency = ["guided","sal","inputx","occlusion"]
-model_dir = "data/models/snli/cnn/cnn"
-output_dir = "data\saliency\snli\cnn"
-dataset_dir = "data/e-SNLI/dataset"
-batch_size = None
-sliding_window = 1
-random.seed(seed)
-torch.manual_seed(seed)
-torch.cuda.manual_seed_all(seed)
-torch.backends.cudnn.deterministic = True
-np.random.seed(seed)
 
-device = torch.device("cuda")
+args = {
+    "dataset": "snli",
+    "dataset_dir": "data/e-SNLI/dataset/",
+    "split": "test",
+    "model": "cnn",
+    "models_dir": "data/models/snli/cnn/cnn",
+    "gpu": False,
+    "seed": 73,
+    "output_dir": "data/saliency/snli/cnn/",
+    "sw": 1,
+    "saliency": ["guided","sal","inputx","occlusion"],
+    "batch_size": None
+}
+random.seed(args["seed"])
+torch.manual_seed(args["seed"])
+torch.cuda.manual_seed_all(args["seed"])
+torch.backends.cudnn.deterministic = True
+np.random.seed(args["seed"])
+
+device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-for saliency in saliency:
+for saliency in args["saliency"]:
     print('Running Saliency ', saliency, flush=True)
 
     if saliency in ['guided', 'sal', 'inputx', 'deeplift']:
@@ -178,17 +184,14 @@ for saliency in saliency:
         flops = []
         print('Running aggregation ', aggregation, flush=True)
 
-        models_dir = models_dir
+        models_dir = args["models_dir"]
         base_model_name = models_dir.split('/')[-1]
         for model in range(1, 6):
             curr_flops = generate_saliency(
                 os.path.join(models_dir + f'_{model}'),
-                os.path.join(output_dir, f'{base_model_name}_{model}_{saliency}_{aggregation}'), 
+                os.path.join(args["output_dir"], f'{base_model_name}_{model}_{saliency}_{aggregation}'), 
                 saliency, 
-                aggregation, 
-                dataset_dir, 
-                batch_size, 
-                sliding_window)
+                aggregation)
 
             flops.append(np.average(curr_flops))
 
