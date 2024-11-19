@@ -27,9 +27,9 @@ class BertModelWrapper(nn.Module):
         results = []
         token_ids = [[int(i) for i in instance_ids.split(' ') if i != ''] for
                      instance_ids in token_ids]
-        for i in tqdm(range(0, len(token_ids), self.args.batch_size),
+        for i in tqdm(range(0, len(token_ids), self.args["batch_size"]),
                       'Building a local approximation...'):
-            batch_ids = token_ids[i:i + self.args.batch_size]
+            batch_ids = token_ids[i:i + self.args["batch_size"]]
             max_batch_id = min(max([len(_l) for _l in batch_ids]), 512)
             batch_ids = [_l[:max_batch_id] for _l in batch_ids]
             padded_batch_ids = [
@@ -54,9 +54,9 @@ class ModelWrapper(nn.Module):
         results = []
         token_ids = [[int(i) for i in instance_ids.split(' ') if i != ''] for
                      instance_ids in token_ids]
-        for i in tqdm(range(0, len(token_ids), self.args.batch_size),
+        for i in tqdm(range(0, len(token_ids), self.args["batch_size"]),
                       'Building a local approximation...'):
-            batch_ids = token_ids[i:i + self.args.batch_size]
+            batch_ids = token_ids[i:i + self.args["batch_size"]]
             max_batch_id = max([len(_l) for _l in batch_ids])
             padded_batch_ids = [
                 _l + [self.tokenizer.pad_token_id] * (max_batch_id - len(_l))
@@ -67,14 +67,14 @@ class ModelWrapper(nn.Module):
         return np.array(results)
 
 
-def generate_saliency(model_path, saliency_path, dataset_dir, labels):
-    test = NLIDataset(dataset_dir, type="test", salient_features=True)
+def generate_saliency(model_path, saliency_path,args):
+    test = NLIDataset(args["dataset_dir"], type=args["split"], salient_features=True)
     checkpoint = torch.load(model_path,
                             map_location=lambda storage, loc: storage)
-    model_args = argparse.Namespace(**checkpoint['args'])
+    model_args =checkpoint['args']
 
 
-    model_args.batch_size = 300
+    model_args["batch_size"] = 300
     model = CNN_MODEL(tokenizer, model_args,
                         n_labels=checkpoint['args']['labels']).to(device)
 
@@ -99,7 +99,7 @@ def generate_saliency(model_path, saliency_path, dataset_dir, labels):
                 exp = explainer.explain_instance(
                     " ".join([str(i) for i in token_ids]), modelw,
                     num_features=len(token_ids),
-                    top_labels=labels)
+                    top_labels=args["labels"])
             except Exception as e:
                 print(e)
 
@@ -108,7 +108,7 @@ def generate_saliency(model_path, saliency_path, dataset_dir, labels):
                     token_saliency = {
                         'token': tokenizer.ids_to_tokens[token_id]
                     }
-                    for cls_ in range(labels):
+                    for cls_ in range(args["labels"]):
                         token_saliency[int(cls_)] = 0
                     saliencies.append(token_saliency)
 
@@ -119,7 +119,7 @@ def generate_saliency(model_path, saliency_path, dataset_dir, labels):
 
             # SERIALIZE
             explanation = {}
-            for cls_ in range(labels):
+            for cls_ in range(args["labels"]):
                 cls_expl = {}
                 for (w, s) in exp.as_list(label=cls_):
                     cls_expl[int(w)] = s
@@ -128,7 +128,7 @@ def generate_saliency(model_path, saliency_path, dataset_dir, labels):
             for token_id in token_ids:
                 token_id = int(token_id)
                 token_saliency = {'token': tokenizer.ids_to_tokens[token_id]}
-                for cls_ in range(labels):
+                for cls_ in range(args["labels"]):
                     token_saliency[int(cls_)] = explanation[cls_].get(token_id,
                                                                       None)
                 saliencies.append(token_saliency)
@@ -144,13 +144,13 @@ args = {
     "dataset_dir": "data/e-SNLI/dataset/",
     "split": "test",
     "model": "cnn",
-    "models_dir": "data/models/snli/cnn/cnn",
+    "models_path": "data/models/snli/cnn/cnn",
     "gpu": False,
+    "gpu_id":0,
     "seed": 73,
-    "output_dir": "data/saliency/tweet/cnn/",
-    "sw": 1,
+    "output_dir": "data/saliency/snli/cnn/",
+    "labels":3,
     "saliency": ["guided","sal","inputx","occlusion"],
-    "batch_size": None
 }
 random.seed(args["seed"])
 torch.manual_seed(args["seed"])
@@ -163,11 +163,10 @@ device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 for model in range (1,6):
-    model_path = models_path + f"_{model}"
+    model_path = args["models_path"] + f"_{model}"
     print(model_path, flush=True)
     all_flops = generate_saliency(model_path, 
-                                os.path.join(output_dir, 
+                                os.path.join(args["output_dir"], 
                                 f'{model_path.split("/")[-1]}_lime'),
-                                dataset_dir,
-                                labels)
+                                args)
     print('FLOPS', np.average(all_flops), np.std(all_flops))
