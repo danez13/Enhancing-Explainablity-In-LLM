@@ -19,12 +19,12 @@ from models.data_loader import NLIDataset,collate_nli
 from models.model_builder import CNN_MODEL
 
 
-def generate_saliency(model_path, saliency_path, batch_size, dataset_dir, split, labels):
+def generate_saliency(model_path, saliency_path,args):
     checkpoint = torch.load(model_path,
                             map_location=lambda storage, loc: storage)
-    model_args = Namespace(**checkpoint['args'])
-    model_args.batch_size = batch_size if batch_size != None else \
-        model_args.batch_size
+    model_args = checkpoint['args']
+    model_args["batch_size"] = args["batch_size"] if args["batch_size"] != None else \
+        model_args["batch_size"]
 
     model = CNN_MODEL(tokenizer, model_args,
                         n_labels=checkpoint['args']['labels']).to(device)
@@ -38,8 +38,8 @@ def generate_saliency(model_path, saliency_path, batch_size, dataset_dir, split,
                          return_attention_masks=False,
                          pad_to_max_length=False)
 
-    test = NLIDataset(dataset_dir, type=split, salient_features=True)
-    test_dl = DataLoader(batch_size=model_args.batch_size, dataset=test,
+    test = NLIDataset(args["dataset_dir"], type=args["split"], salient_features=True)
+    test_dl = DataLoader(batch_size=model_args["batch_size"], dataset=test,
                          shuffle=False, collate_fn=collate_fn)
 
     # PREDICTIONS
@@ -68,7 +68,7 @@ def generate_saliency(model_path, saliency_path, batch_size, dataset_dir, split,
 
             token_ids = batch[0].detach().cpu().numpy().tolist()
 
-            for cls_ in range(labels):
+            for cls_ in range(args["labels"]):
                 attributions = ablator.attribute(batch[0].float(), target=cls_,
                                                  additional_forward_args=additional)
                 attributions = attributions.detach().cpu().numpy().tolist()
@@ -80,7 +80,7 @@ def generate_saliency(model_path, saliency_path, batch_size, dataset_dir, split,
                     if token_id == tokenizer.pad_token_id:
                         continue
                     token_sal = {'token': tokenizer.ids_to_tokens[token_id]}
-                    for cls_ in range(labels):
+                    for cls_ in range(["labels"]):
                         token_sal[int(cls_)] = class_attr_list[cls_][i][token_i]
                     saliencies.append(token_sal)
 
@@ -107,33 +107,35 @@ class BertModelWrapper(torch.nn.Module):
     def forward(self, input):
         return self.model(input.long(), attention_mask=input > 0)[0]
 
-seed = 73
-models_path = "models/snli/cnn/cnn"
-output_dir = "data/saliency/snli/cnn/"
-dataset_dir = "data/e-SNLI/dataset"
-labels = 3
-batch_size = None
-split="test"
+args = {
+    "dataset_dir":"data/e-SNLI/dataset/",
+    "dataset": "snli",
+    "split":"test",
+    "model":"cnn",
+    "gpu":False,
+    "seed":73,
+    "labels":3,
+    "model_path":"data/models/snli/cnn/cnn",
+    "output_dir":"data/saliency/snli/cnn/",
+    "batch_size":None
+}
 
-random.seed(seed)
-torch.manual_seed(seed)
-torch.cuda.manual_seed_all(seed)
+random.seed(args["seed"])
+torch.manual_seed(args["seed"])
+torch.cuda.manual_seed_all(args["seed"])
 torch.backends.cudnn.deterministic = True
-np.random.seed(seed)
+np.random.seed(args["seed"])
 
-device = torch.device("cuda")
+device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 for model in range(1,6):
-    model_path = models_path+f"_{model}"
+    model_path = args["models_path"]+f"_{model}"
     model_name = model_path.split('/')[-1]
 
-    all_flops = generate_saliency(model_path, os.path.join(output_dir,
+    all_flops = generate_saliency(model_path, os.path.join(args["output_dir"],
                                                             f'{model_name}_shap'),
-                                                            batch_size,
-                                                            dataset_dir,
-                                                            split,
-                                                            labels)
+                                                            args)
 
 print('FLOPS', np.average(all_flops), np.std(all_flops), flush=True)
