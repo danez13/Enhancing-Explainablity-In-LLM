@@ -80,7 +80,7 @@ def generate_saliency(model_path, saliency_path,args):
                     if token_id == tokenizer.pad_token_id:
                         continue
                     token_sal = {'token': tokenizer.ids_to_tokens[token_id]}
-                    for cls_ in range(["labels"]):
+                    for cls_ in range(args["labels"]):
                         token_sal[int(cls_)] = class_attr_list[cls_][i][token_i]
                     saliencies.append(token_sal)
 
