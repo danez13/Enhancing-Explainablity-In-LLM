@@ -12,7 +12,7 @@ from sklearn.preprocessing import MinMaxScaler
 from tqdm import tqdm
 from transformers import BertTokenizer
 
-from models.data_loader import get_collate_fn, get_dataset
+from models.data_loader import collate_nli, NLIDataset
 from saliency_eval.consistency_rats import get_layer_names, get_model
 
 
@@ -111,49 +111,33 @@ def get_model_embedding_emb_size(model):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model_dir_trained",
-                        help="Directory with trained models", type=str)
-    parser.add_argument("--model_dir_random",
-                        help="Directory with randomly initialized and "
-                             "not trained models", type=str)
-    parser.add_argument("--saliency_dir_trained",
-                        help="Directory with saliencies serialized for the "
-                             "trained models", type=str)
-    parser.add_argument("--saliency_dir_random", help="Directory with saliencies"
-                                                      "serialized for the "
-                                                      "non-trained models",
-                        type=str)
-    parser.add_argument('--saliencies',
-                        help='Names of the saliencies to be considered',
-                        type=str, nargs='+')
-    parser.add_argument('--model', help='Name of the model that the saliencies '
-                                        'are computed for',
-                        type=str, default='trans')
-    parser.add_argument("--dataset_dir",
-                        help="Path to the direcory with the datasets",
-                        default='data/e-SNLI/dataset/', type=str)
-    parser.add_argument("--gpu", help="Flag for running on gpu",
-                        action='store_true', default=False)
-    parser.add_argument("--dataset", help='Which dataset are the saliencies for',
-                        choices=['snli', 'imdb', 'tweet'])
+    args = {
+        "model_dir_trained": "data/models/snli/cnn/",
+        "model_dir_random": "data/models/snli/random_cnn/",
+        "saliency_dir_random": "data/saliency/snli/random_cnn/",
+        "saliency_dir_trained": "data/saliency/snli/cnn/",
+        "saliencies": ["rand","shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"],
+        "model": "cnn",
+        "dataset_dir": "data/e-SNLI/dataset",
+        "gpu": False,
+        "dataset": "snli"
+    }
 
-    args = parser.parse_args()
     np.random.seed(1)
 
-    for saliency in args.saliencies:
+    for saliency in args["saliencies"]:
         print(saliency)
 
         tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        models_trained = [_m for _m in os.listdir(args.model_dir_trained)
+        models_trained = [_m for _m in os.listdir(args["model_dir_trained"])
                           if not _m.endswith('.predictions')]
-        full_model_paths_trained = [os.path.join(args.model_dir_trained, _m) for
+        full_model_paths_trained = [os.path.join(args["model_dir_trained"], _m) for
                                     _m in models_trained]
         saliency_trained = [
-            os.path.join(args.saliency_dir_trained, _m + f'_{saliency}') for _m
+            os.path.join(args["saliency_dir_trained"], _m + f'_{saliency}') for _m
             in models_trained]
 
-        device = torch.device("cuda") if args.gpu else torch.device("cpu")
+        device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
         test = get_dataset(args.dataset_dir, args.dataset)
         return_attention_masks = args.model == 'trans'
 

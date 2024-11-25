@@ -7,21 +7,16 @@ import numpy as np
 import torch
 from nltk.corpus import stopwords
 
-from models.data_loader import get_dataset
+from models.data_loader import NLIDataset
 
 _stopwords = set(stopwords.words('english'))
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset_dir",
-                        help="Path to the direcory with the datasets",
-                        default='data/e-SNLI/dataset/',
-                        type=str)
-    parser.add_argument("--dataset", help='Which dataset is being sampled',
-                        default='snli',
-                        choices=['snli', 'imdb', 'tweet'], type=str)
 
-    args = parser.parse_args()
+    args = {
+        "dataset_dir": "data/e-SNLI/dataset",
+        "dataset": "snli",
+    }
     seed = 73
     random.seed(seed)
     torch.manual_seed(seed)
@@ -29,18 +24,12 @@ if __name__ == "__main__":
     torch.backends.cudnn.deterministic = True
     np.random.seed(seed)
 
-    test = get_dataset(args.dataset_dir, args.dataset, mode='test')
+    test = NLIDataset(args["dataset_dir"], type="test", salient_features=True)
 
-    if args.dataset == 'snli':
-        split_tokens = [set([tok for tok in f'{_t[1]}'.lower().split() if
-                             tok not in _stopwords]) for _t in test]
-        labels = [_t[2] for _t in test]
-        doc_ids = [_i[0].split('.jpg')[0] for _i in test._dataset]
-    else:
-        split_tokens = [set([tok for tok in f'{_t[0]}'.lower().split() if
-                             tok not in _stopwords]) for _t in test]
-        labels = [_t[1] for _t in test]
-        doc_ids = list(range(len(labels)))
+    split_tokens = [set([tok for tok in f'{_t[1]}'.lower().split() if
+                            tok not in _stopwords]) for _t in test]
+    labels = [_t[2] for _t in test]
+    doc_ids = [_i[0].split('.jpg')[0] for _i in test._dataset]
 
     same_l = []
     different_l = []
@@ -66,7 +55,7 @@ if __name__ == "__main__":
     print(split_tokens[different_l[0][0]])
     print(split_tokens[different_l[0][1]])
 
-    with open(f'selected_pairs_{args.dataset}.tsv', 'w') as out:
+    with open(f'selected_pairs_{args["dataset"]}.tsv', 'w') as out:
         for inst in same_l[:2000]:
             out.write(f'{inst[0]}\t{inst[1]}\n')
         for inst in random.sample(different_l[:5000], 2000):

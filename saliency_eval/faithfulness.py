@@ -31,7 +31,7 @@ def get_model(model_path):
 if __name__ == "__main__":
     args = {
         "gpu": False,
-        "saliency": ["shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"],
+        "saliency": ["rand","shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"],
         "dataset": "snli",
         "dataset_dir": "data/e-SNLI/dataset",
         "test_saliency_dir": ["data/saliency/snli/cnn/","data/saliency/snli/random_cnn/"],

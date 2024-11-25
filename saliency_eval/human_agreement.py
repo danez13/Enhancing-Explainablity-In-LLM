@@ -14,7 +14,7 @@ if __name__ == "__main__":
         "dataset": "snli",
         "dataset_dir": "data/e-SNLI/dataset",
         "saliency_path": ["data/saliency/snli/cnn/cnn","data/saliency/snli/random_cnn/cnn"],
-        "saliencies": ["shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"]
+        "saliencies": ["rand","shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"]
     }
     print(args, flush=True)
 

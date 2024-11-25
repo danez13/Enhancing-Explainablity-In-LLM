@@ -48,7 +48,7 @@ if __name__ == "__main__":
     args = {
         "models_dir": ["data/models/snli/cnn/","data/models/snli/random_cnn/"],
         "saliency_dir": ["data/saliency/snli/cnn/","data/saliency/snli/random_cnn/"],
-        "saliency": ["shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"],
+        "saliency": ["rand","shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"],
         "upsample": "up"
     }
     
