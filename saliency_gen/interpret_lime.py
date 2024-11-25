@@ -13,6 +13,7 @@ from transformers import BertTokenizer
 
 from models.data_loader import NLIDataset
 from models.model_builder import CNN_MODEL
+import time
 
 
 class BertModelWrapper(nn.Module):
@@ -89,6 +90,7 @@ def generate_saliency(model_path, saliency_path,args):
     with open(saliency_path, 'w') as out:
         for instance in tqdm(test):
             # SALIENCY
+            start = time.time()
             saliencies = []
             token_ids = tokenizer.encode(instance[0], instance[1])
 
@@ -116,6 +118,9 @@ def generate_saliency(model_path, saliency_path,args):
                 out.flush()
 
                 continue
+            
+            end = time.time()
+            saliency_flops.append(end-start)
 
             # SERIALIZE
             explanation = {}

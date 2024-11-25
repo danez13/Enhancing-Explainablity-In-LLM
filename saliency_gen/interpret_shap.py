@@ -17,6 +17,7 @@ from transformers import BertTokenizer
 
 from models.data_loader import NLIDataset,collate_nli
 from models.model_builder import CNN_MODEL
+import time
 
 
 def generate_saliency(model_path, saliency_path,args):
@@ -66,6 +67,8 @@ def generate_saliency(model_path, saliency_path,args):
 
             additional = None
 
+            start = time.time()
+
             token_ids = batch[0].detach().cpu().numpy().tolist()
 
             for cls_ in range(args["labels"]):
@@ -73,6 +76,9 @@ def generate_saliency(model_path, saliency_path,args):
                                                  additional_forward_args=additional)
                 attributions = attributions.detach().cpu().numpy().tolist()
                 class_attr_list[cls_] += attributions
+
+            end=time.time()
+            saliency_flops.append((end-start)/batch[0].shape[0])
 
             for i in range(len(batch[0])):
                 saliencies = []

@@ -18,6 +18,7 @@ from transformers import BertTokenizer
 
 from models.data_loader import collate_nli, NLIDataset
 from models.model_builder import CNN_MODEL
+import time
 
 
 def summarize_attributions(attributions, type='mean', model=None, tokens=None):
@@ -108,7 +109,9 @@ def generate_saliency(model_path, saliency_path, saliency, aggregation):
         if saliency != 'occlusion':
             input_embeddings = interpretable_embedding.indices_to_embeddings(
                 batch[0])
-            
+
+        start = time.time()
+
         for cls_ in range(checkpoint['args']['labels']):
             if saliency == 'occlusion':
                 attributions = ablator.attribute(batch[0],
@@ -127,7 +130,8 @@ def generate_saliency(model_path, saliency_path, saliency, aggregation):
             ).numpy().tolist()
             class_attr_list[cls_] += [[_li for _li in _l] for _l in
                                       attributions]
-
+        end = time.time()
+        saliency_flops.append((end-start)/batch[0].shape[0])
     if saliency != 'occlusion':
         remove_interpretable_embedding_layer(model, interpretable_embedding)
 
