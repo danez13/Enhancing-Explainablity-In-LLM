@@ -154,10 +154,10 @@ args = {
     "dataset_dir": "data/e-SNLI/dataset/",
     "split": "test",
     "model": "cnn",
-    "models_dir": "data/models/snli/cnn/cnn",
+    "models_dir": ["data/models/snli/cnn/cnn","data/models/snli/random_cnn/cnn"],
     "gpu": False,
     "seed": 73,
-    "output_dir": "data/saliency/snli/cnn/",
+    "output_dir": ["data/saliency/snli/cnn/","data/saliency/snli/random_cnn/"],
     "sw": 1,
     "saliency": ["guided","sal","inputx","occlusion"],
     "batch_size": None
@@ -184,17 +184,17 @@ for saliency in args["saliency"]:
         flops = []
         print('Running aggregation ', aggregation, flush=True)
 
-        models_dir = args["models_dir"]
-        base_model_name = models_dir.split('/')[-1]
-        for model in range(1, 6):
-            curr_flops = generate_saliency(
-                os.path.join(models_dir + f'_{model}'),
-                os.path.join(args["output_dir"], f'{base_model_name}_{model}_{saliency}_{aggregation}'), 
-                saliency, 
-                aggregation)
+        for models_dir,output_dir in zip(args["models_dir"],args["output_dir"]):
+            base_model_name = models_dir.split('/')[-1]
+            for model in range(1, 6):
+                curr_flops = generate_saliency(
+                    os.path.join(models_dir + f'_{model}'),
+                    os.path.join(output_dir, f'{base_model_name}_{model}_{saliency}_{aggregation}'), 
+                    saliency, 
+                    aggregation)
 
-            flops.append(np.average(curr_flops))
+                flops.append(np.average(curr_flops))
 
-        print('FLOPS', np.average(flops), np.std(flops), flush=True)
-        print()
-        print()
+            print('FLOPS', np.average(flops), np.std(flops), flush=True)
+            print()
+            print()

@@ -115,8 +115,8 @@ args = {
     "gpu":False,
     "seed":73,
     "labels":3,
-    "model_path":"data/models/snli/cnn/cnn",
-    "output_dir":"data/saliency/snli/cnn/",
+    "models_path": ["data/models/snli/cnn/cnn","data/models/snli/random_cnn/cnn"],
+    "output_dir": ["data/saliency/snli/cnn/","data/saliency/snli/random_cnn/"],
     "batch_size":None
 }
 
@@ -131,11 +131,12 @@ device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 for model in range(1,6):
-    model_path = args["models_path"]+f"_{model}"
-    model_name = model_path.split('/')[-1]
+    for models_path,output_dir in zip(args["models_path"],args["output_dir"]):
+        model_path = models_path+f"_{model}"
+        model_name = model_path.split('/')[-1]
 
-    all_flops = generate_saliency(model_path, os.path.join(args["output_dir"],
-                                                            f'{model_name}_shap'),
-                                                            args)
+        all_flops = generate_saliency(model_path, os.path.join(output_dir,
+                                                                f'{model_name}_shap'),
+                                                                args)
 
-print('FLOPS', np.average(all_flops), np.std(all_flops), flush=True)
+    print('FLOPS', np.average(all_flops), np.std(all_flops), flush=True)

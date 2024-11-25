@@ -16,6 +16,39 @@ _NLI_DIC_LABELS = {'entailment': 2, 'neutral': 1, 'contradiction': 0}
 def identity(x):
     return x
 
+def collate_threshold(instances: List[Dict],
+                      tokenizer: PreTrainedTokenizer,
+                      return_attention_masks: bool = True,
+                      pad_to_max_length: bool = False,
+                      device='cuda',
+                      collate_orig=None,
+                      threshold=1.0, n_classes=3) -> List[torch.Tensor]:
+    batch = collate_orig(instances,
+                         tokenizer,
+                         return_attention_masks=return_attention_masks,
+                         pad_to_max_length=pad_to_max_length,
+                         device=device)
+
+    for i, instance in enumerate(batch[0]):
+        saliencies = instances[i][-1]
+        word_saliencies = [sum([_d[f'{_c}'] for _c in range(n_classes)]) for _d
+                           in saliencies]
+        sorted_idx = numpy.array(word_saliencies).argsort()[::-1]
+
+        n_tokens = len([_t for _t in instance if _t != tokenizer.pad_token_id])
+        num_mask_tokens = int((threshold / 100) * n_tokens)
+
+        num_masked = 0
+        if num_mask_tokens > 0:
+            for _id in sorted_idx:
+                if _id < n_tokens and instance[_id] != tokenizer.pad_token_id:
+                    instance[_id] = tokenizer.mask_token_id
+                    num_masked += 1
+                if num_masked == num_mask_tokens:
+                    break
+
+    return batch
+
 def collate_nli(instances: List[Dict],
                 tokenizer: PreTrainedTokenizer,
                 return_attention_masks: bool = True,
@@ -142,6 +175,20 @@ class BucketBatchSampler(BatchSampler):
             return len(self.sampler) // self.batch_size
         else:
             return math.ceil(len(self.sampler) / self.batch_size)
+
+class DatasetSaliency(Dataset):
+    def __init__(self, dataset_cls, sal_dir):
+        self._dataset_cls = dataset_cls
+        self._dataset = []
+        with open(sal_dir) as out:
+            for line in out:
+                self._dataset.append(json.loads(line)['tokens'])
+
+    def __len__(self):
+        return len(self._dataset)
+
+    def __getitem__(self, item):
+        return tuple(self._dataset_cls[item] + tuple([self._dataset[item]]))
 
 class NLIDataset(Dataset):
     _PATHS = {
