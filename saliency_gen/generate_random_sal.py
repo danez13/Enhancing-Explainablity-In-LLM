@@ -56,4 +56,4 @@ if __name__ == "__main__":
                 print(np.mean(saliency_flops), np.std(saliency_flops))
                 flops.append(np.mean(saliency_flops))
 
-            print('FLOPs', f'{np.mean(flops):.2f} ($\pm${np.std(flops):.2f})')
+            print('FLOPs', f'{np.mean(flops):.2f} {np.std(flops):.2f}')
