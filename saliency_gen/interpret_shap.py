@@ -17,6 +17,7 @@ from transformers import BertTokenizer
 
 from models.data_loader import NLIDataset,collate_nli
 from models.model_builder import CNN_MODEL
+import time
 
 
 def generate_saliency(model_path, saliency_path,args):
@@ -66,6 +67,8 @@ def generate_saliency(model_path, saliency_path,args):
 
             additional = None
 
+            start = time.time()
+
             token_ids = batch[0].detach().cpu().numpy().tolist()
 
             for cls_ in range(args["labels"]):
@@ -73,6 +76,9 @@ def generate_saliency(model_path, saliency_path,args):
                                                  additional_forward_args=additional)
                 attributions = attributions.detach().cpu().numpy().tolist()
                 class_attr_list[cls_] += attributions
+
+            end=time.time()
+            saliency_flops.append((end-start)/batch[0].shape[0])
 
             for i in range(len(batch[0])):
                 saliencies = []
@@ -115,8 +121,8 @@ args = {
     "gpu":False,
     "seed":73,
     "labels":3,
-    "model_path":"data/models/snli/cnn/cnn",
-    "output_dir":"data/saliency/snli/cnn/",
+    "models_path": ["data/models/snli/cnn/cnn","data/models/snli/random_cnn/cnn"],
+    "output_dir": ["data/saliency/snli/cnn/","data/saliency/snli/random_cnn/"],
     "batch_size":None
 }
 
@@ -131,11 +137,12 @@ device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 for model in range(1,6):
-    model_path = args["models_path"]+f"_{model}"
-    model_name = model_path.split('/')[-1]
+    for models_path,output_dir in zip(args["models_path"],args["output_dir"]):
+        model_path = models_path+f"_{model}"
+        model_name = model_path.split('/')[-1]
 
-    all_flops = generate_saliency(model_path, os.path.join(args["output_dir"],
-                                                            f'{model_name}_shap'),
-                                                            args)
+        all_flops = generate_saliency(model_path, os.path.join(output_dir,
+                                                                f'{model_name}_shap'),
+                                                                args)
 
-print('FLOPS', np.average(all_flops), np.std(all_flops), flush=True)
+    print('FLOPS', np.average(all_flops), np.std(all_flops), flush=True)

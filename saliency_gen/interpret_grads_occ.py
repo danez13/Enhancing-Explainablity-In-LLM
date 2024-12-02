@@ -18,6 +18,7 @@ from transformers import BertTokenizer
 
 from models.data_loader import collate_nli, NLIDataset
 from models.model_builder import CNN_MODEL
+import time
 
 
 def summarize_attributions(attributions, type='mean', model=None, tokens=None):
@@ -108,7 +109,9 @@ def generate_saliency(model_path, saliency_path, saliency, aggregation):
         if saliency != 'occlusion':
             input_embeddings = interpretable_embedding.indices_to_embeddings(
                 batch[0])
-            
+
+        start = time.time()
+
         for cls_ in range(checkpoint['args']['labels']):
             if saliency == 'occlusion':
                 attributions = ablator.attribute(batch[0],
@@ -127,7 +130,8 @@ def generate_saliency(model_path, saliency_path, saliency, aggregation):
             ).numpy().tolist()
             class_attr_list[cls_] += [[_li for _li in _l] for _l in
                                       attributions]
-
+        end = time.time()
+        saliency_flops.append((end-start)/batch[0].shape[0])
     if saliency != 'occlusion':
         remove_interpretable_embedding_layer(model, interpretable_embedding)
 
@@ -154,10 +158,10 @@ args = {
     "dataset_dir": "data/e-SNLI/dataset/",
     "split": "test",
     "model": "cnn",
-    "models_dir": "data/models/snli/cnn/cnn",
+    "models_dir": ["data/models/snli/cnn/cnn","data/models/snli/random_cnn/cnn"],
     "gpu": False,
     "seed": 73,
-    "output_dir": "data/saliency/snli/cnn/",
+    "output_dir": ["data/saliency/snli/cnn/","data/saliency/snli/random_cnn/"],
     "sw": 1,
     "saliency": ["guided","sal","inputx","occlusion"],
     "batch_size": None
@@ -184,17 +188,17 @@ for saliency in args["saliency"]:
         flops = []
         print('Running aggregation ', aggregation, flush=True)
 
-        models_dir = args["models_dir"]
-        base_model_name = models_dir.split('/')[-1]
-        for model in range(1, 6):
-            curr_flops = generate_saliency(
-                os.path.join(models_dir + f'_{model}'),
-                os.path.join(args["output_dir"], f'{base_model_name}_{model}_{saliency}_{aggregation}'), 
-                saliency, 
-                aggregation)
+        for models_dir,output_dir in zip(args["models_dir"],args["output_dir"]):
+            base_model_name = models_dir.split('/')[-1]
+            for model in range(1, 6):
+                curr_flops = generate_saliency(
+                    os.path.join(models_dir + f'_{model}'),
+                    os.path.join(output_dir, f'{base_model_name}_{model}_{saliency}_{aggregation}'), 
+                    saliency, 
+                    aggregation)
 
-            flops.append(np.average(curr_flops))
+                flops.append(np.average(curr_flops))
 
-        print('FLOPS', np.average(flops), np.std(flops), flush=True)
-        print()
-        print()
+            print('FLOPS', np.average(flops), np.std(flops), flush=True)
+            print()
+            print()
