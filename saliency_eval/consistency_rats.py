@@ -11,8 +11,7 @@ import numpy as np
 import torch
 from scipy.stats import spearmanr
 from sklearn.preprocessing import MinMaxScaler
-from transformers import BertConfig, BertForSequenceClassification, \
-    BertTokenizer
+from transformers import BertTokenizer
 
 from models.data_loader import collate_nli, NLIDataset
 from models.model_builder import CNN_MODEL
@@ -79,7 +78,7 @@ if __name__ == "__main__":
             os.path.join(args["saliency_dir_random"], _m + f'_{saliency}') for _m
             in models_rand]
 
-        return_attention_masks = args.model == 'trans'
+        return_attention_masks = False
 
         device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
         test = NLIDataset(args["dataset_dir"], type="test", salient_features=True)
@@ -90,8 +89,7 @@ if __name__ == "__main__":
                              return_attention_masks=return_attention_masks,
                              pad_to_max_length=False,
                              collate_orig=coll_call,
-                             n_classes=3 if args["dataset"] in ['snli',
-                                                             'tweet'] else 2)
+                             n_classes=3)
 
         layers = get_layer_names(args["model"], args["dataset"])
 
@@ -153,3 +151,6 @@ if __name__ == "__main__":
         sp = spearmanr(diff_act, diff_sal)
         print()
         print(f'{sp[0]:.3f} ({sp[1]:.1e})', flush=True)
+        output_file = f"{args["output_dir"]}/cnn_consistency_{saliency}"
+        with open(output_file,"w") as file:
+            file.write(f"{sp[0]:.3f} {sp[1]:.1e}\n")

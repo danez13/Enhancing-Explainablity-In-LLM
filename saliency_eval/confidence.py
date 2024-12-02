@@ -49,7 +49,8 @@ if __name__ == "__main__":
         "models_dir": ["data/models/snli/cnn/","data/models/snli/random_cnn/"],
         "saliency_dir": ["data/saliency/snli/cnn/","data/saliency/snli/random_cnn/"],
         "saliency": ["rand","shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"],
-        "upsample": "up"
+        "upsample": "up",
+        "output_dir": ["data/evaluations/snli/cnn/","data/evaluations/snli/random_cnn/"]
     }
     
     np.random.seed(1)
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         print(saliency)
         test_scores = []
         test_coefs = []
-        for models_dir, saliency_dir in zip(args["models_dir"],args["saliency_dir"]):
+        for models_dir, saliency_dir,output_dir in zip(args["models_dir"],args["saliency_dir"],args["output_dir"]):
             for model_path in os.listdir(models_dir):
 
                 if model_path.endswith('.predictions'):
@@ -165,3 +166,7 @@ if __name__ == "__main__":
             print(' '.join([f"{np.mean([_s[l] for _s in test_scores]):.3f} "
                             f"($\pm$ {np.std([_s[l] for _s in test_scores]):.3f})"
                             for l in range(len(test_scores[0]))]), flush=True)
+            output_file = f"{output_dir}cnn_confidence_{saliency}"
+            with open(output_file,"w") as file:
+                for l in range(len(test_scores[0])):
+                    file.write(f"{np.mean([_s[l] for _s in test_scores]):.3f} {np.std([_s[l] for _s in test_scores]):.3f}\n")

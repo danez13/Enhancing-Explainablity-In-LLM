@@ -28,13 +28,12 @@ def get_saliencies(saliency_path):
             saliency = instance_saliency['tokens']
 
             instance = test[i]
-            if args.dataset == 'snli':
-                token_ids = tokenizer.encode(instance[0], instance[1])
-            else:
-                token_ids = tokenizer.encode(instance[0])
+
+            token_ids = tokenizer.encode(instance[0], instance[1])
+
             token_pred_saliency = []
 
-            n_labels = 2 if args.dataset == 'imdb' else 3
+            n_labels = 3
             for _cls in range(0, n_labels):
                 for record in saliency:
                     token_pred_saliency.append(record[str(_cls)])
@@ -60,10 +59,7 @@ def get_layer_activation(layer, model, instance):
     activations = []
     with torch.no_grad():
         batch = collate_fn([instance])
-        if args.model == 'trans':
-            model(batch[0], attention_mask=batch[1], labels=batch[2])
-        else:
-            model(batch[0])
+        model(batch[0])
 
     if handle:
         handle.remove()
@@ -91,9 +87,9 @@ def get_layer_activation(layer, model, instance):
     return activ1
 
 
-def get_model_distv2(model, x, y):
+def get_model_distv2(model, x, y,args):
     dist = []
-    layer_names = get_layer_names(args.model, args.dataset)
+    layer_names = get_layer_names(args["model"], args["dataset"])
     for layer in layer_names:
         act1 = get_layer_activation(layer, model, x)
         act2 = get_layer_activation(layer, model, y)
@@ -103,11 +99,8 @@ def get_model_distv2(model, x, y):
     return dist
 
 
-def get_model_embedding_emb_size(model):
-    if args.model == 'trans':
-        return model.bert.embeddings.word_embeddings.weight.shape[0]
-    else:
-        return model.embedding.weight.shape[0]
+def get_model_embedding_emb_size(model,):
+    return model.embedding.weight.shape[0]
 
 
 if __name__ == "__main__":
@@ -120,7 +113,8 @@ if __name__ == "__main__":
         "model": "cnn",
         "dataset_dir": "data/e-SNLI/dataset",
         "gpu": False,
-        "dataset": "snli"
+        "dataset": "snli",
+        "output_dir": "data/evaluations/snli/cnn"
     }
 
     np.random.seed(1)
@@ -138,16 +132,16 @@ if __name__ == "__main__":
             in models_trained]
 
         device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
-        test = get_dataset(args.dataset_dir, args.dataset)
-        return_attention_masks = args.model == 'trans'
+        test = NLIDataset(args["dataset_dir"],type="test")
+        return_attention_masks = False
 
-        coll_call = get_collate_fn(args.dataset, args.model)
+        coll_call = collate_nli
         collate_fn = partial(coll_call, tokenizer=tokenizer, device=device,
                              return_attention_masks=True,
                              pad_to_max_length=True)
 
         dataset_ids = []
-        with open(f'selected_pairs_{args.dataset}.tsv') as out:
+        with open(f'selected_pairs_{args["dataset"]}.tsv') as out:
             for line in out:
                 line = line.strip().split()
                 dataset_ids.append((int(line[0]), int(line[1])))
@@ -155,7 +149,7 @@ if __name__ == "__main__":
         all_scores = []
         for i, model_path in enumerate(full_model_paths_trained):
             print(model_path, flush=True)
-            model, model_args = get_model(model_path, device, args.model,
+            model, model_args = get_model(model_path, device, args["model"],
                                           tokenizer)
             model_size = get_model_embedding_emb_size(model)
 
@@ -163,12 +157,13 @@ if __name__ == "__main__":
 
             diff_activation, diff_saliency = [], []
             dist_dir = f'consist_data/' \
-                f'{args.dataset}_{model_path.split("/")[-1]}'
+                f'{args["dataset"]}_{model_path.split("/")[-1]}'
             if not os.path.exists(dist_dir):
                 for i, (ind1, ind2) in tqdm(enumerate(dataset_ids),
                                             desc='Loading Model Differences'):
                     model_dist = get_model_distv2(model, test[int(ind1)],
-                                                  test[int(ind2)])
+                                                  test[int(ind2)],
+                                                  args)
                     diff_activation.append(model_dist)
 
                 with open(dist_dir, 'w') as out:
@@ -216,3 +211,5 @@ if __name__ == "__main__":
         print(f'\n{np.mean([_scores[0] for _scores in all_scores]):.3f} '
               f'({np.mean([_scores[1] for _scores in all_scores]):.1e})\n',
               flush=True)
+        with open(args["output_dir"],"w") as file:
+            file.write(f"{np.mean([_scores[0] for _scores in all_scores]):.3f} {np.mean([_scores[1] for _scores in all_scores]):.1e}")

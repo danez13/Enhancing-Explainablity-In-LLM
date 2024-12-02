@@ -114,8 +114,6 @@ if __name__ == "__main__":
         for index,path in enumerate(args["model_path"]):
             if index == 1:
                 args["init_only"]=True
-            else:
-                continue
             random.seed(args["seed"])
             np.random.seed(args["seed"])
             torch.manual_seed(args["seed"])

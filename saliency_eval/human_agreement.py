@@ -14,7 +14,8 @@ if __name__ == "__main__":
         "dataset": "snli",
         "dataset_dir": "data/e-SNLI/dataset",
         "saliency_path": ["data/saliency/snli/cnn/cnn","data/saliency/snli/random_cnn/cnn"],
-        "saliencies": ["rand","shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"]
+        "saliencies": ["rand","shap", "sal_mean", "sal_l2", "occlusion_none", "lime", "inputx_mean", "inputx_l2", "guided_mean", "guided_l2"],
+        "output_dir": ["data/evaluations/snli/cnn/","data/evaluations/snli/random_cnn/"]
     }
     print(args, flush=True)
 
@@ -25,8 +26,8 @@ if __name__ == "__main__":
     for saliency_name in args["saliencies"]:
         avg_seeds = []
         for m in range(1,6):
-            for sp in args["saliency_path"]:
-                saliency_path = sp+f"{m}"
+            for sp,output_dir in zip(args["saliency_path"],args["output_dir"]):
+                saliency_path = sp+f"_{m}"
                 avgp = []
 
                 prediction_path = saliency_path.replace('saliency',
@@ -72,3 +73,6 @@ if __name__ == "__main__":
             print(saliency_name, flush=True)
             print(f'{np.mean(avg_seeds):.3f} ($\pm${np.std(avg_seeds):.3f})',
                 flush=True)
+            output_file = f"{output_dir}cnn_humanAgreement_{saliency}"
+            with open(output_file,"w") as file:
+                file.write(f"{np.mean(avg_seeds):.3f} {np.std(avg_seeds):.3f}\n")

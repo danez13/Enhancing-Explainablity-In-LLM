@@ -37,7 +37,8 @@ if __name__ == "__main__":
         "test_saliency_dir": ["data/saliency/snli/cnn/","data/saliency/snli/random_cnn/"],
         "model_path": ["data/models/snli/cnn/cnn","data/models/snli/random_cnn/cnn"],
         "models_dir": ["data/models/snli/cnn/","data/models/snli/random_cnn/"],
-        "model": "cnn"
+        "model": "cnn",
+        "output_dir": ["data/evaluations/snli/cnn/","data/evaluations/snli/random_cnn/"]
     }
 
     device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
@@ -52,7 +53,7 @@ if __name__ == "__main__":
     eval_fn = eval_model
 
     for saliency in args["saliency"]:
-        for models_dir,test_saliency_dir in zip(args["models_dir"],args["test_saliency_dir"]):
+        for models_dir,test_saliency_dir,output_dir in zip(args["models_dir"],args["test_saliency_dir"],args["output_dir"]):
             for model_path in os.listdir(models_dir):
                 if model_path.endswith('.predictions'):
                     continue
@@ -94,3 +95,6 @@ if __name__ == "__main__":
                 aucs.append(auc(thresholds, model_scores))
 
             print(f'{np.mean(aucs):.2f} ($\pm${np.std(aucs):.2f})')
+            output_file = f"{output_dir}cnn_faithfulness_{saliency}"
+            with open(output_file,"w") as file:
+                file.write(f"{np.mean(aucs):.2f} {np.std(aucs):.2f}\n")
