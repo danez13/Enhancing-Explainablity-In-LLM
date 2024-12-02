@@ -14,8 +14,8 @@ from torch.utils.data.sampler import BatchSampler
 from tqdm import tqdm
 from transformers import BertTokenizer
 
-from data_loader import BucketBatchSampler, NLIDataset, collate_nli
-from model_builder import CNN_MODEL, EarlyStopping
+from models.data_loader import BucketBatchSampler, NLIDataset, collate_nli
+from models.model_builder import CNN_MODEL, EarlyStopping
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="torch.utils.data.sampler")
@@ -26,6 +26,7 @@ def train_model(model: torch.nn.Module,
                 scheduler: torch.optim.lr_scheduler.LambdaLR,
                 n_epochs: int,
                 early_stopping: EarlyStopping) -> (Dict, Dict):
+
     loss_f = torch.nn.CrossEntropyLoss()
 
     best_val, best_model_weights = {'val_f1': 0}, None
@@ -55,6 +56,7 @@ def train_model(model: torch.nn.Module,
         if early_stopping.step(val_f1):
             print('Early stopping...')
             break
+
 
     return best_model_weights, best_val
 
@@ -91,66 +93,76 @@ def eval_model(model: torch.nn.Module, test_dl: BucketBatchSampler,
 
     return p, r, f1, np.mean(losses), labels_all, prediction
 
-for i in range(1,6):
-    args = {
-    "gpu":False,
-    "seed":73,
-    "labels":3,
-    "dataset_dir":"data/e-SNLI/dataset",
-    "model_path": f"data/models/snli/cnn/cnn_{i}",
-    "batch_size": 256,
-    "lr":0.0001,
-    "epochs":100,
-    "mode": "test",
-    "patience": 5,
-    "model": "cnn",
-    "embedding_dir": "./glove/",
-    "dropout":0.05,
-    "embedding_dim":300,
-    "in_channels":1,
-    "out_channels": 300,
-    "kernel_heights": [4,5,6,7],
-    "stride":1,
-    "padding":0
-    }
+if __name__ == "__main__":
+    for i in range(1,6):
+        args = {
+        "gpu":False,
+        "init_only": False,
+        "seed":73,
+        "labels":3,
+        "dataset_dir":"data/e-SNLI/dataset",
+        "model_path": [f"data/models/snli/cnn/cnn_{i}",f"data/models/snli/random_cnn/cnn_{i}"],
+        "batch_size": 256,
+        "lr":0.0001,
+        "epochs":100,
+        "mode": "test",
+        "patience": 5,
+        "model": "cnn",
+        "embedding_dir": "./glove/",
+        "dropout":0.05,
+        "embedding_dim":300,
+        "in_channels":1,
+        "out_channels": 300,
+        "kernel_heights": [4,5,6,7],
+        "stride":1,
+        "padding":0
+        }
+        for index,path in enumerate(args["model_path"]):
+            print(index)
+            if index == 1:
+                args["init_only"]=True
+            random.seed(args["seed"])
+            np.random.seed(args["seed"])
+            torch.manual_seed(args["seed"])
+            torch.cuda.manual_seed_all(args["seed"])
+            torch.backends.cudnn.deterministic = True
+            device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
+            tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+            collate_fn = partial(collate_nli, tokenizer=tokenizer, device=device,
+                                return_attention_masks=False, pad_to_max_length=False)
+            sort_key = lambda x: len(x[0]) + len(x[1])
+            model = CNN_MODEL(tokenizer, args, n_labels=3).to(device)
 
-    random.seed(args["seed"])
-    np.random.seed(args["seed"])
-    torch.manual_seed(args["seed"])
-    torch.cuda.manual_seed_all(args["seed"])
-    torch.backends.cudnn.deterministic = True
-    device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    collate_fn = partial(collate_nli, tokenizer=tokenizer, device=device,
-                        return_attention_masks=False, pad_to_max_length=False)
-    sort_key = lambda x: len(x[0]) + len(x[1])
-    model = CNN_MODEL(tokenizer, args, n_labels=3).to(device)
+            print("Loading datasets...")
+            train = NLIDataset(args["dataset_dir"], type='train',salient_features=True)
+            dev = NLIDataset(args["dataset_dir"], type='dev')
 
-    print("Loading datasets...")
-    train = NLIDataset(args["dataset_dir"], type='train')
-    dev = NLIDataset(args["dataset_dir"], type='dev')
+            train_dl = BucketBatchSampler(batch_size=args["batch_size"],
+                                        sort_key=sort_key, dataset=train,
+                                        collate_fn=collate_fn)
+            dev_dl = BucketBatchSampler(batch_size=args["batch_size"],
+                                    sort_key=sort_key, dataset=dev,
+                                    collate_fn=collate_fn)
 
-    train_dl = BucketBatchSampler(batch_size=args["batch_size"],
-                                sort_key=sort_key, dataset=train,
-                                collate_fn=collate_fn)
-    dev_dl = BucketBatchSampler(batch_size=args["batch_size"],
-                            sort_key=sort_key, dataset=dev,
-                            collate_fn=collate_fn)
+            print(model)
+            optimizer = AdamW(model.parameters(), lr=args["lr"])
+            scheduler = ReduceLROnPlateau(optimizer)
+            es = EarlyStopping(patience=args["patience"], percentage=False, mode='max', min_delta=0.0)
 
-    print(model)
-    optimizer = AdamW(model.parameters(), lr=args["lr"])
-    scheduler = ReduceLROnPlateau(optimizer)
-    es = EarlyStopping(patience=args["patience"], percentage=False, mode='max',
-                    min_delta=0.0)
+            if not args["init_only"]:
+                best_model_w, best_perf = train_model(model, train_dl, dev_dl,
+                                                    optimizer, scheduler,
+                                                    args["epochs"],
+                                                    es)
+            else:
+                best_model_w, best_perf = model.state_dict(), {'val_f1': 0}
 
-    best_model_w, best_perf = train_model(model, train_dl, dev_dl, optimizer, scheduler, args["epochs"], es)
+            checkpoint = {
+            'performance': best_perf,
+            'args':args,
+            'model': best_model_w,
+            }
+            print(best_perf)
+            print(args)
 
-    checkpoint = {
-    'performance': best_perf,
-    'args':args,
-    'model': best_model_w,
-    }
-    print(best_perf)
-    print(args)
-
-    torch.save(checkpoint, args["model_path"])
+            torch.save(checkpoint, path)
