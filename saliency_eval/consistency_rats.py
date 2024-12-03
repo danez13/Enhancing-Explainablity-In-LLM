@@ -94,7 +94,7 @@ if __name__ == "__main__":
         layers = get_layer_names(args["model"], args["dataset"])
 
         precomputed = []
-        for _f in os.scandir('consist_rat'):
+        for _f in os.scandir('data/evaluations/snli/cnn'):
             _f = _f.name
             if args["model"] in _f and args["dataset"] in _f and _f.startswith(
                     'precomp_'):
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
         diff_activation, diff_saliency = [], []
         for f in precomputed:
-            act_distances = json.load(open('consist_rat/' + f))
+            act_distances = json.load(open('data/evaluations/snli/cnn/' + f))
             ids = [int(_n) for _n in f.split('_') if _n.isdigit()]
             model_p = f.split('_')[3]
             if model_p == 'not':

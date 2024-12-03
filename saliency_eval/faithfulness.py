@@ -94,7 +94,7 @@ if __name__ == "__main__":
                 print(thresholds, model_scores)
                 aucs.append(auc(thresholds, model_scores))
 
-            print(f'{np.mean(aucs):.2f} ($\pm${np.std(aucs):.2f})')
+            print(f'{np.mean(aucs):.2f} ({np.std(aucs):.2f})')
             output_file = f"{output_dir}cnn_faithfulness_{saliency}"
             with open(output_file,"w") as file:
                 file.write(f"{np.mean(aucs):.2f} {np.std(aucs):.2f}\n")

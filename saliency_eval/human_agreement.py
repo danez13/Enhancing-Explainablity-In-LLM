@@ -73,6 +73,6 @@ if __name__ == "__main__":
             print(saliency_name, flush=True)
             print(f'{np.mean(avg_seeds):.3f} ($\pm${np.std(avg_seeds):.3f})',
                 flush=True)
-            output_file = f"{output_dir}cnn_humanAgreement_{saliency}"
+            output_file = f"{output_dir}cnn_humanAgreement_{saliency_name}"
             with open(output_file,"w") as file:
                 file.write(f"{np.mean(avg_seeds):.3f} {np.std(avg_seeds):.3f}\n")
