@@ -6,7 +6,8 @@ import numpy as np
 if __name__ == "__main__":
     args = {
         "eval_paths": ["data/evaluations/snli/cnn"],
-        "evaluations": ["confidence","faithfulness","humanAgreement","consistency","dataConsistency"]
+        "evaluations": ["confidence","faithfulness","humanAgreement","consistency","dataConsistency"],
+        "save_figures": "data/analysis/"
     }
     data = {}
     for evaluations in args["evaluations"]:
@@ -39,15 +40,19 @@ if __name__ == "__main__":
                     data[_e[1]]["metrics"].append(_e[2])
                     data[_e[1]]["mean"].append(values[0])
                     data[_e[1]]["standard deviation"].append(values[1])
+                elif _e[1] == "dataConsistency":
+                    data[_e[1]]["metrics"].append(_e[2])
+                    data[_e[1]]["mean"].append(values[0])
+                    data[_e[1]]["standard deviation"].append(values[1])
     for key, _d in data.items():
         print(key)
+        output_file = f"{args['save_figures']}{key}.png"
         df = pd.DataFrame(_d)
         df["mean"] = pd.to_numeric(df["mean"], errors='coerce')
         df["standard deviation"] = pd.to_numeric(df["standard deviation"], errors='coerce')
-
         # Now plot the data
-        df.plot(x="metrics", y=["mean", "standard deviation"], kind="bar", figsize=(12, 6))
+        df.plot(x="metrics", y=["mean", "standard deviation"], kind="bar", figsize=(12, 15))
         plt.title(f"Mean and Standard Deviation for {key}")
         plt.xlabel("Metrics")
         plt.ylabel("Values")
-        plt.show()
+        plt.savefig(output_file)
