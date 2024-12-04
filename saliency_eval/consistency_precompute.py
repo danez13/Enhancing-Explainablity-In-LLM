@@ -10,8 +10,7 @@ from functools import partial
 import numpy as np
 import torch
 from tqdm import tqdm
-from transformers import BertConfig, BertForSequenceClassification, \
-    BertTokenizer
+from transformers import BertTokenizer
 
 from models.data_loader import collate_nli, NLIDataset
 from models.model_builder import CNN_MODEL

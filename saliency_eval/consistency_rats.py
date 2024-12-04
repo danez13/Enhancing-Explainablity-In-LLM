@@ -11,11 +11,21 @@ import numpy as np
 import torch
 from scipy.stats import spearmanr
 from sklearn.preprocessing import MinMaxScaler
-from transformers import BertConfig, BertForSequenceClassification, \
-    BertTokenizer
+from transformers import BertTokenizer
 
 from models.data_loader import collate_nli, NLIDataset
 from models.model_builder import CNN_MODEL
+
+def get_model(model_path, device, model_type, tokenizer):
+    checkpoint = torch.load(model_path,
+                            map_location=lambda storage, loc: storage)
+    model_args = checkpoint['args']
+    model_cp = CNN_MODEL(tokenizer, model_args,
+                             n_labels=checkpoint['args']['labels']).to(device)
+
+    model_cp.load_state_dict(checkpoint['model'])
+
+    return model_cp, model_args
 
 def get_saliencies(saliency_path):
     result = []
@@ -56,6 +66,7 @@ if __name__ == "__main__":
         "dataset":"snli",
         "dataset_dir": "data/e-SNLI/dataset",
         "per_layer": False,
+        "output_dir": "data/evaluations/snli/cnn"
     }
     print(args, flush=True)
 
@@ -79,7 +90,7 @@ if __name__ == "__main__":
             os.path.join(args["saliency_dir_random"], _m + f'_{saliency}') for _m
             in models_rand]
 
-        return_attention_masks = args.model == 'trans'
+        return_attention_masks = False
 
         device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
         test = NLIDataset(args["dataset_dir"], type="test", salient_features=True)
@@ -90,13 +101,12 @@ if __name__ == "__main__":
                              return_attention_masks=return_attention_masks,
                              pad_to_max_length=False,
                              collate_orig=coll_call,
-                             n_classes=3 if args["dataset"] in ['snli',
-                                                             'tweet'] else 2)
+                             n_classes=3)
 
         layers = get_layer_names(args["model"], args["dataset"])
 
         precomputed = []
-        for _f in os.scandir('consist_rat'):
+        for _f in os.scandir('data/evaluations/snli/cnn/'):
             _f = _f.name
             if args["model"] in _f and args["dataset"] in _f and _f.startswith(
                     'precomp_'):
@@ -104,7 +114,7 @@ if __name__ == "__main__":
 
         diff_activation, diff_saliency = [], []
         for f in precomputed:
-            act_distances = json.load(open('consist_rat/' + f))
+            act_distances = json.load(open('data/evaluations/snli/cnn/' + f))
             ids = [int(_n) for _n in f.split('_') if _n.isdigit()]
             model_p = f.split('_')[3]
             if model_p == 'not':
@@ -153,3 +163,6 @@ if __name__ == "__main__":
         sp = spearmanr(diff_act, diff_sal)
         print()
         print(f'{sp[0]:.3f} ({sp[1]:.1e})', flush=True)
+        output_file = f"{args['output_dir']}/cnn_consistency_{saliency}"
+        with open(output_file,"w") as file:
+            file.write(f"{sp[0]:.3f} {sp[1]:.1e}\n")
