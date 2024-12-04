@@ -12,53 +12,90 @@ _glove_path = "glove.6B.{}d.txt".format
 
 
 class EarlyStopping:
+    """
+    A class to implement early stopping during training to prevent overfitting.
+    
+    Attributes:
+        mode (str): 'min' to monitor a metric that needs to decrease, 'max' for a metric that needs to increase.
+        min_delta (float): Minimum change in the monitored metric to qualify as an improvement.
+        patience (int): Number of epochs to wait for improvement before stopping training.
+        percentage (bool): Whether `min_delta` is interpreted as a percentage of the best value.
+    """
+    
     def __init__(self, mode='min', min_delta=0, patience=10, percentage=False):
-        self.mode = mode
-        self.min_delta = min_delta
-        self.patience = patience
-        self.best = None
-        self.num_bad_epochs = 0
-        self.is_better = None
-        self._init_is_better(mode, min_delta, percentage)
+        """
+        Initializes the EarlyStopping object with specified criteria.
 
+        Args:
+            mode (str): Determines whether to minimize or maximize the metric. Choices are 'min' or 'max'.
+            min_delta (float): Minimum change to consider as an improvement.
+            patience (int): Number of epochs to wait for improvement before stopping.
+            percentage (bool): If True, interprets `min_delta` as a percentage of the metric value.
+        """
+        self.mode = mode  # Whether we are looking for a minimum or maximum improvement.
+        self.min_delta = min_delta  # Minimum required change to count as improvement.
+        self.patience = patience  # How many epochs without improvement to wait before stopping.
+        self.best = None  # Stores the best metric value observed so far.
+        self.num_bad_epochs = 0  # Counter for consecutive epochs without improvement.
+        self.is_better = None  # Function to determine if the current metric is better than the best so far.
+        self._init_is_better(mode, min_delta, percentage)  # Initialize the comparison function.
+
+        # If patience is set to 0, always continue training.
         if patience == 0:
             self.is_better = lambda a, b: True
             self.step = lambda a: False
 
     def step(self, metrics):
-        if self.best is None:
+        """
+        Updates the early stopping criteria based on the current metric value.
+
+        Args:
+            metrics (float): The current value of the monitored metric.
+
+        Returns:
+            bool: True if training should stop, False otherwise.
+        """
+        if self.best is None:  # If no best value has been set yet, initialize it.
             self.best = metrics
             return False
 
-        if np.isnan(metrics):
+        if np.isnan(metrics):  # Stop training if the metric value is NaN.
             return True
 
-        if self.is_better(metrics, self.best):
-            self.num_bad_epochs = 0
-            self.best = metrics
+        if self.is_better(metrics, self.best):  # Check if the current metric is better.
+            self.num_bad_epochs = 0  # Reset the counter for bad epochs.
+            self.best = metrics  # Update the best metric value.
         else:
-            self.num_bad_epochs += 1
+            self.num_bad_epochs += 1  # Increment bad epoch counter.
 
-        if self.num_bad_epochs >= self.patience:
+        if self.num_bad_epochs >= self.patience:  # Stop if bad epochs exceed patience.
             return True
 
-        return False
+        return False  # Continue training otherwise.
 
     def _init_is_better(self, mode, min_delta, percentage):
-        if mode not in {'min', 'max'}:
+        """
+        Initializes the comparison function based on the mode and criteria.
+
+        Args:
+            mode (str): 'min' for minimizing the metric, 'max' for maximizing.
+            min_delta (float): Minimum change required to consider as improvement.
+            percentage (bool): If True, interprets `min_delta` as a percentage of the best value.
+        """
+        if mode not in {'min', 'max'}:  # Validate mode.
             raise ValueError('mode ' + mode + ' is unknown!')
-        if not percentage:
+
+        if not percentage:  # Define comparison based on absolute difference.
             if mode == 'min':
                 self.is_better = lambda a, best: a < best - min_delta
             if mode == 'max':
                 self.is_better = lambda a, best: a > best + min_delta
-        else:
+        else:  # Define comparison based on percentage difference.
             if mode == 'min':
-                self.is_better = lambda a, best: a < best - (
-                        best * min_delta / 100)
+                self.is_better = lambda a, best: a < best - (best * min_delta / 100)
             if mode == 'max':
-                self.is_better = lambda a, best: a > best + (
-                        best * min_delta / 100)
+                self.is_better = lambda a, best: a > best + (best * min_delta / 100)
+
 
 
 def _get_glove_embeddings(embedding_dim: int, glove_dir: str):
