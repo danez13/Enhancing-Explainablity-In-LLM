@@ -16,6 +16,17 @@ from transformers import BertTokenizer
 from models.data_loader import collate_nli, NLIDataset
 from models.model_builder import CNN_MODEL
 
+def get_model(model_path, device, model_type, tokenizer):
+    checkpoint = torch.load(model_path,
+                            map_location=lambda storage, loc: storage)
+    model_args = checkpoint['args']
+    model_cp = CNN_MODEL(tokenizer, model_args,
+                             n_labels=checkpoint['args']['labels']).to(device)
+
+    model_cp.load_state_dict(checkpoint['model'])
+
+    return model_cp, model_args
+
 def get_saliencies(saliency_path):
     result = []
     n_labels = 3
@@ -55,6 +66,7 @@ if __name__ == "__main__":
         "dataset":"snli",
         "dataset_dir": "data/e-SNLI/dataset",
         "per_layer": False,
+        "output_dir": "data/evaluations/snli/cnn"
     }
     print(args, flush=True)
 
@@ -94,7 +106,7 @@ if __name__ == "__main__":
         layers = get_layer_names(args["model"], args["dataset"])
 
         precomputed = []
-        for _f in os.scandir('data/evaluations/snli/cnn'):
+        for _f in os.scandir('data/evaluations/snli/cnn/'):
             _f = _f.name
             if args["model"] in _f and args["dataset"] in _f and _f.startswith(
                     'precomp_'):
@@ -151,6 +163,6 @@ if __name__ == "__main__":
         sp = spearmanr(diff_act, diff_sal)
         print()
         print(f'{sp[0]:.3f} ({sp[1]:.1e})', flush=True)
-        output_file = f"{args["output_dir"]}/cnn_consistency_{saliency}"
+        output_file = f"{args['output_dir']}/cnn_consistency_{saliency}"
         with open(output_file,"w") as file:
             file.write(f"{sp[0]:.3f} {sp[1]:.1e}\n")

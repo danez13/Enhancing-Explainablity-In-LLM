@@ -30,5 +30,9 @@ if __name__ == "__main__":
                     data[_e[1]]["metrics"].append(_e[2])
                     data[_e[1]]["mean"].append(values[0])
                     data[_e[1]]["standard deviation"].append(values[1])
+                elif _e[1] == "consistency":
+                    data[_e[1]]["metrics"].append(_e[2])
+                    data[_e[1]]["mean"].append(values[0])
+                    data[_e[1]]["standard deviation"].append(values[1])
     df = pd.DataFrame(data)
     print(df,flush=True)
