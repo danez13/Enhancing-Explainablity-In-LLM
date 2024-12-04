@@ -38,3 +38,7 @@ python -m saliency_eval.consistency_rats
 python -m saliency_eval.consist_data_sample_instance_pairs
 python -m saliency_eval.consist_data
 ```
+4. analyze the evaluations
+```
+python analysis.py
+```
