@@ -5,7 +5,10 @@ import random
 
 import numpy as np
 import torch
+
+import nltk
 from nltk.corpus import stopwords
+nltk.download('stopwords')
 
 from models.data_loader import NLIDataset
 
