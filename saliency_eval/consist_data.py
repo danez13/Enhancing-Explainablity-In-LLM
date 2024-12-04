@@ -156,7 +156,7 @@ if __name__ == "__main__":
             saliencies, tokens = get_saliencies(saliency_trained[i])
 
             diff_activation, diff_saliency = [], []
-            dist_dir = f'consist_data/' \
+            dist_dir = f'data/saliency/snli/cnn/' \
                 f'{args["dataset"]}_{model_path.split("/")[-1]}'
             if not os.path.exists(dist_dir):
                 for i, (ind1, ind2) in tqdm(enumerate(dataset_ids),
@@ -211,5 +211,6 @@ if __name__ == "__main__":
         print(f'\n{np.mean([_scores[0] for _scores in all_scores]):.3f} '
               f'({np.mean([_scores[1] for _scores in all_scores]):.1e})\n',
               flush=True)
-        with open(args["output_dir"],"w") as file:
+        output_file = f"{args['output_dir']}/cnn_dataConsistency_{saliency}"
+        with open(output_file,"w") as file:
             file.write(f"{np.mean([_scores[0] for _scores in all_scores]):.3f} {np.mean([_scores[1] for _scores in all_scores]):.1e}")
