@@ -128,7 +128,6 @@ if __name__ == "__main__":
             "padding":0  # Padding for convolution layers
         }
         # Loop through different model paths to initialize and train models
-        for index, path in enumerate(args["model_path"]):
         for index,path in enumerate(args["model_path"]):
             print(index)
             if index == 1:
