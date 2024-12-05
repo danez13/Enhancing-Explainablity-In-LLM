@@ -50,23 +50,26 @@
             </div>
         </nav>
         <div class="container">
-            <h1>Model Module</h1>
+            <h1>Saliency evaluation Module</h1>
             <p>
-                This section provides detailed insights, code explanations, usage, and instructions for various components of the models module
+                This section provides detailed insights, code explanations, usage, and instructions for various components of the saliency evaluation module
             </p>
     
             <h2>Module Overview</h2>
             <p>
-                the model module encompasses multiple sections that in include data handling, model utilities, saliency utilities, and model training
+                the model module encompasses multiple sections that in include detailed explanations of the different evaluation criteria used and how they where interpreted.
             </p>
     
             <h2>Sections Covered</h2>
             <div class="sections">
                 <ul>
-                    <li><b>dataset loading</b> custom datasets, samplers, and collate functions for natural language inference (NLI) models.</li>
-                    <li><b>model building:</b> training utilities</li>
-                    <li><b>saliency Utilities:</b> extracting saliency scores for tokens in the ESNLI dataset</li>
-                    <li><b>CNN model training:</b> training Convolutional Neural Networks (CNN) models on the e-SNLI dataset</li>
+                    <li><b>Confidence:</b> evaluating generated metrics for model confidence</li>
+                    <li><b>Faithfulness:</b> evaluating generated metrics for model faithfulness</li>
+                    <li><b>Human Agreement:</b> evaluating generated metrics for model human agreement</li>
+                    <li><b>Rational Consistency precomputation:</b> precomputation for rational consistency</li>
+                    <li><b>Rational Consistency:</b> evaluating generated metrics for model rational consistency</li>
+                    <li><b>Data Conisitency sampling pairs:</b> indicate sampling pairs for data consistency</li>
+                    <li><b>Data Consistency :</b> evaluating generated metrics for model data consistency</li>
                 </ul>
             </div>
             <h2>Getting Started</h2>
@@ -75,10 +78,13 @@
             </p>
             <div class="navigation">
                 <ul>
-                    <li><a href="data_loader.html">load dataset</a></li>
-                    <li><a href="model_builder.html">build model</a></li>
-                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
-                    <li><a href="train_cnn.html">train CNN model</a></li>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
                 </ul>
             </div>
         </div>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for evaluating and visualizing various model performance metrics on the e-SNLI dataset using confidence, faithfulness, human agreement, consistency, and data consistency.">
+    <title>Model Evaluation and Visualization Documentation</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prereqs.html">prerequisites</a></li>
+            <li>
+                <a href="model.html">model</a>
+                <ul>
+                    <li><a href="data_loader.html">load dataset</a></li>
+                    <li><a href="model_builder.html">build model</a></li>
+                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
+                    <li><a href="train_cnn.html">train CNN model</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_gen.html">saliency generation</a>
+                <ul>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_eval.html">saliency evaluation</a>
+                <ul>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
+                </ul>
+            </li>
+            <li><a href="analysis.html">analysis</a></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Model Evaluation and Visualization</h1>
+            <p>This script evaluates various metrics (confidence, faithfulness, human agreement, consistency, and data consistency) for a CNN model trained on the e-SNLI dataset, generating and saving corresponding bar plots for visual analysis.</p>
+        </header>
+
+        <div class="section" id="overview">
+            <h2>Overview</h2>
+            <p>This script evaluates model performance across different evaluation types and generates corresponding visualizations for each metric. It processes evaluation files stored in a specified directory, computes the mean and standard deviation for each metric, and saves the results as bar plots.</p>
+            <p>The script performs the following tasks:</p>
+            <ul>
+                <li>Reads evaluation files from specified directories.</li>
+                <li>Processes confidence, faithfulness, human agreement, consistency, and data consistency metrics.</li>
+                <li>Computes mean and standard deviation for each metric.</li>
+                <li>Generates and saves bar plots for visual analysis of the results.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="usage">
+            <h2>Usage</h2>
+            <p>To run the script and generate the evaluation plots, execute the following command:</p>
+            <pre><code>python analysis.py</code></pre>
+            <p>The script processes evaluation files, computes the required metrics, and saves the resulting plots in the specified output directory.</p>
+            <h3>Key Features:</h3>
+            <ul>
+                <li>Evaluation of multiple performance metrics (confidence, faithfulness, etc.).</li>
+                <li>Visualization of mean and standard deviation as bar plots for each evaluation type.</li>
+                <li>Support for different evaluation directories and file structures.</li>
+                <li>Automatic generation of plots saved as PNG files for further analysis.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="parameters">
+            <h2>Parameters</h2>
+            <p>The script accepts several parameters that control its behavior, mainly defined in the <code>args</code> dictionary:</p>
+            <ul>
+                <li><strong>eval_paths</strong>: List of directories containing evaluation files (e.g., "data/evaluations/snli/cnn").</li>
+                <li><strong>evaluations</strong>: List of evaluation types to process (e.g., "confidence", "faithfulness", "consistency").</li>
+                <li><strong>save_figures</strong>: Directory where the generated plots will be saved (e.g., "data/analysis/").</li>
+            </ul>
+        </div>
+
+        <div class="section" id="output">
+            <h2>Output</h2>
+            <p>The script generates bar plots for each evaluation type (e.g., "confidence", "faithfulness", etc.). Each plot displays the mean and standard deviation for various metrics and is saved as a PNG file in the <code>save_figures</code> directory.</p>
+            <p>For example, a plot for the "confidence" evaluation type will be saved as <code>data/analysis/confidence.png</code>.</p>
+        </div>
+
+        <div class="section" id="example-graphs">
+            <h2>Example Graphs</h2>
+            <p>Below are some example graphs generated by the script for different evaluation metrics. These graphs display the mean and standard deviation for various evaluation types.</p>
+            <div class="graph-container">
+                <div class="graph-item">
+                    <img src="assets/confidence.png" alt="Confidence Evaluation">
+                    <h3>Confidence Evaluation</h3>
+                </div>
+                <div class="graph-item">
+                    <img src="assets/faithfulness.png" alt="Faithfulness Evaluation">
+                    <h3>Faithfulness Evaluation</h3>
+                </div>
+                <div class="graph-item">
+                    <img src="assets/humanAgreement.png" alt="Human Agreement Evaluation">
+                    <h3>Human Agreement Evaluation</h3>
+                </div>
+                <div class="graph-item">
+                    <img src="assets/consistency.png" alt="Consistency Evaluation">
+                    <h3>Consistency Evaluation</h3>
+                </div>
+                <div class="graph-item">
+                    <img src="assets/dataConsistency.png" alt="Data Consistency Evaluation">
+                    <h3>Data Consistency Evaluation</h3>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>

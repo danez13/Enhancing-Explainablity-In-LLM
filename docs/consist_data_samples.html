@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Documentation for generating random saliency scores for baseline models.">
-    <title>Random Saliency Score Generation - Documentation</title>
+    <meta name="description" content="Documentation for sampling instances to evaluate the Data Consistency measure.">
+    <title>Data Consistency Evaluation Documentation</title>
     <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
 </head>
 <body>
@@ -53,61 +53,56 @@
 
     <div class="container">
         <header>
-            <h1>Random Saliency Score Generation</h1>
-            <p>This script generates random saliency scores as a baseline for comparison with other saliency methods.</p>
+            <h1>Data Consistency Instance Pairs Sampling</h1>
+            <p>This script samples 4000 pairs of instances for evaluating the Data Consistency measure using text similarity based on token overlap.</p>
         </header>
 
         <div class="section" id="overview">
             <h2>Overview</h2>
             <p>
-                This script processes precomputed saliency files, replaces their values with random scores, and saves the results for further evaluation. 
-                It supports multiple saliency methods and models while ensuring reproducibility through fixed random seeds.
+                This script selects pairs of instances from a dataset to evaluate the Data Consistency measure by comparing token overlap.
+                It generates 2000 pairs with the same label and a high token overlap, and 2000 pairs with different labels and minimal token overlap.
             </p>
+            <p>The script performs the following tasks:</p>
+            <ul>
+                <li>Loads the dataset and tokenizes text, excluding common stopwords.</li>
+                <li>Generates pairs of instances with the same or different labels.</li>
+                <li>Calculates the token overlap between pairs to evaluate similarity.</li>
+                <li>Saves 2000 "same-label" and 2000 "different-label" pairs to a file for further evaluation.</li>
+            </ul>
         </div>
 
         <div class="section" id="usage">
             <h2>Usage</h2>
-            <p>Run the script to generate random saliency scores:</p>
-            <pre><code>python -m saliency_gen.generate_random_saliency</code></pre>
+            <p>To run the script, execute the following command:</p>
+            <pre><code>python -m saliency_eval.consist_data_sample_instance_pairs</code></pre>
+            <p>Ensure the dataset directory is properly configured in the script.</p>
             <h3>Key Features:</h3>
             <ul>
-                <li>Processes multiple saliency methods and model checkpoints.</li>
-                <li>Generates random scores for each token in the saliency map.</li>
-                <li>Ensures reproducibility through fixed random seeds.</li>
-                <li>Tracks and reports computational FLOPs (time per sample).</li>
+                <li>Sampling of pairs based on label similarity and token overlap.</li>
+                <li>Excludes common stopwords to focus on more meaningful tokens.</li>
+                <li>Saves the sampled pairs to a TSV file for further evaluation.</li>
             </ul>
         </div>
 
         <div class="section" id="parameters">
             <h2>Parameters</h2>
-            <p>The script uses a predefined argument dictionary to configure the process:</p>
+            <p>Key configuration parameters in the script:</p>
             <ul>
-                <li><strong>saliencies</strong>: List of saliency methods (e.g., "shap", "lime", "occlusion").</li>
-                <li><strong>output_path</strong>: List of base output paths for saving saliency scores.</li>
-                <li><strong>seed</strong>: Random seed for reproducibility.</li>
-                <li><strong>labels</strong>: Number of output classes (e.g., 3 for entailment, contradiction, neutral).</li>
+                <li><strong>dataset_dir</strong>: Directory path containing the dataset (e.g., "data/e-SNLI/dataset").</li>
+                <li><strong>dataset</strong>: The dataset name (e.g., "snli").</li>
+                <li><strong>seed</strong>: The seed for randomization to ensure reproducibility.</li>
             </ul>
-        </div>
-
-        <div class="section" id="execution">
-            <h2>Execution Flow</h2>
-            <ol>
-                <li>Set up the random seed to ensure reproducibility.</li>
-                <li>Iterate over all saliency methods, models, and output paths.</li>
-                <li>For each instance in the saliency file:
-                    <ul>
-                        <li>Parse the JSON object for token-level saliency data.</li>
-                        <li>Replace saliency scores with random values for each token and class.</li>
-                        <li>Write the modified data back to the output file.</li>
-                    </ul>
-                </li>
-                <li>Measure and log the mean and standard deviation of FLOPs for each configuration.</li>
-            </ol>
         </div>
 
         <div class="section" id="evaluation">
             <h2>Evaluation</h2>
-            <p>The script evaluates performance by tracking FLOPs (floating-point operations per second). The average and standard deviation are reported to analyze the computational cost of the random saliency generation process.</p>
+            <p>The script evaluates the consistency of the dataset by selecting pairs of instances with similar or different labels based on token overlap. It evaluates:</p>
+            <ul>
+                <li><strong>Same-label pairs</strong>: Instances with the same label and high token overlap.</li>
+                <li><strong>Different-label pairs</strong>: Instances with different labels and minimal token overlap.</li>
+            </ul>
+            <p>These selected pairs are saved to a TSV file for further evaluation and analysis.</p>
         </div>
 
         <script src="script.js"></script>

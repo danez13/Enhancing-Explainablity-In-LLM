@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prerequisites - Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prereqs.html">prerequisites</a></li>
+            <li>
+                <a href="model.html">model</a>
+                <ul>
+                    <li><a href="data_loader.html">load dataset</a></li>
+                    <li><a href="model_builder.html">build model</a></li>
+                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
+                    <li><a href="train_cnn.html">train CNN model</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_gen.html">saliency generation</a>
+                <ul>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_eval.html">saliency evaluation</a>
+                <ul>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
+                </ul>
+            </li>
+            <li><a href="analysis.html">analysis</a></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Prerequisites for the Project</h1>
+        
+        <p>Before you start working with the project, ensure that you have the following libraries installed in your Python environment.</p>
+
+        <h2>Required Libraries</h2>
+        <p>To install the required libraries, install the dependencies from the <code>requirements.txt</code> file. Here are the steps to follow:</p>
+
+        <h3>2. Install Required Libraries</h3>
+        <p>install the required libraries using the following command:</p>
+        <pre>
+            pip install -r requirements.txt
+        </pre>
+        
+        <h2>requirements.txt Contents</h2>
+        <p>Here's the content of the <code>requirements.txt</code> file:</p>
+        <pre>
+            captum
+            lime
+            matplotlib
+            nltk
+            numpy==1.26.4
+            scikit-image
+            scikit-learn
+            scipy
+            sentencepiece
+            tokenizers
+            torchvision
+            tqdm
+            transformers
+            pandas
+            fastparquet
+            torch==2.1.0+cu121
+            -f https://download.pytorch.org/whl/torch_stable.html
+        </pre>
+
+        <h2>Downloading and Extracting GloVe Word Vectors</h2>
+        <p>This project requires the GloVe 6B pre-trained word vectors, which can be downloaded from Stanford's NLP website. Below are the steps to automatically download and extract the GloVe dataset using Python:</p>
+
+        <h3>Download GloVe Dataset</h3>
+        <p>The following script will download the GloVe 6B dataset and extract it into a directory called <code>glove</code> in your current working directory.</p>
+        
+        <p>To run the script, execute the following command:</p>
+        <pre><code>python -m saliency_eval.consist_data_sample_instance_pairs</code></pre>
+
+        <h3>Explanation of the Code</h3>
+        <p>This code performs the following actions:</p>
+        <ul>
+            <li><strong>Directory Creation:</strong> It tries to create a directory called <code>glove</code> where the dataset will be stored. If the directory already exists, it ignores the error.</li>
+            <li><strong>Download Dataset:</strong> It downloads the GloVe 6B word vectors from the official Stanford NLP site and saves the file as <code>glove.6B.zip</code> inside the <code>glove</code> directory.</li>
+            <li><strong>Extract ZIP File:</strong> The downloaded ZIP file is extracted into the <code>glove</code> directory.</li>
+            <li><strong>Clean-Up:</strong> After extraction, the ZIP file is removed to save space.</li>
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

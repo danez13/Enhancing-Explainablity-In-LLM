@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for evaluating confidence measures in machine learning models.">
+    <title>Confidence Evaluation Documentation</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prereqs.html">prerequisites</a></li>
+            <li>
+                <a href="model.html">model</a>
+                <ul>
+                    <li><a href="data_loader.html">load dataset</a></li>
+                    <li><a href="model_builder.html">build model</a></li>
+                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
+                    <li><a href="train_cnn.html">train CNN model</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_gen.html">saliency generation</a>
+                <ul>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_eval.html">saliency evaluation</a>
+                <ul>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
+                </ul>
+            </li>
+            <li><a href="analysis.html">analysis</a></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Confidence Evaluation</h1>
+            <p>This script evaluates confidence measures of machine learning models by using saliency data and performance metrics.</p>
+        </header>
+
+        <div class="section" id="overview">
+            <h2>Overview</h2>
+            <p>
+                This script evaluates the confidence of predictions made by machine learning models. It uses various saliency maps, such as SHAP, LIME, and others, to compute features and then applies linear regression to predict the confidence of the model’s predictions.
+            </p>
+            <p>The script performs the following tasks:</p>
+            <ul>
+                <li>Loads model predictions and saliency data.</li>
+                <li>Generates features based on saliency differences and model confidence.</li>
+                <li>Normalizes the feature set using MinMaxScaler.</li>
+                <li>Performs cross-validation and evaluates the model using metrics like Mean Absolute Error and Max Error.</li>
+                <li>Saves the results to output files for further analysis.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="usage">
+            <h2>Usage</h2>
+            <p>To run the script, execute the following command:</p>
+            <pre><code>python -m saliency_eval.confidence</code></pre>
+            <p>Modify the <code>args</code> dictionary to customize the directories and configuration options.</p>
+            <h3>Key Features:</h3>
+            <ul>
+                <li>Evaluates model confidence using saliency-based features.</li>
+                <li>Supports various saliency methods, including SHAP, LIME, and others.</li>
+                <li>Performs cross-validation with upsampling, downsampling, or midpoint sampling of the dataset.</li>
+                <li>Saves results, including mean and standard deviation of test scores, to output files.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="functions">
+            <h2>Functions</h2>
+
+            <h3><code>sample</code></h3>
+            <p>Samples the dataset using upsampling, downsampling, or midpoint sampling.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>X</code>: Features of the dataset.</li>
+                <li><code>y</code>: Labels of the dataset.</li>
+                <li><code>mode</code>: Sampling mode ('up', 'down', 'mid').</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>A sampled version of <code>X</code> and <code>y</code>.</p>
+        </div>
+
+        <div class="section" id="parameters">
+            <h2>Parameters</h2>
+            <p>Key parameters in the <code>args</code> dictionary:</p>
+            <ul>
+                <li><strong>models_dir</strong>: List of directories containing trained models.</li>
+                <li><strong>saliency_dir</strong>: List of directories containing saliency maps.</li>
+                <li><strong>saliency</strong>: List of saliency methods (e.g., "rand", "shap", "lime").</li>
+                <li><strong>upsample</strong>: Sampling mode ('up', 'down', 'mid').</li>
+                <li><strong>output_dir</strong>: List of directories to save the evaluation results.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="evaluation">
+            <h2>Evaluation</h2>
+            <p>The script evaluates the model's confidence predictions using linear regression and calculates performance metrics:</p>
+            <ul>
+                <li><strong>Mean Absolute Error (MAE)</strong>: Measures the average magnitude of errors in predictions.</li>
+                <li><strong>Max Error</strong>: Measures the worst-case error in predictions.</li>
+            </ul>
+            <p>Results are saved to files containing the mean and standard deviation of each metric across cross-validation folds.</p>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>

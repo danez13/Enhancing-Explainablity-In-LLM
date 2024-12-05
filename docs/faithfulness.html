@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for computing faithfulness measures of saliency scores in machine learning models.">
+    <title>Faithfulness Evaluation Documentation</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prereqs.html">prerequisites</a></li>
+            <li>
+                <a href="model.html">model</a>
+                <ul>
+                    <li><a href="data_loader.html">load dataset</a></li>
+                    <li><a href="model_builder.html">build model</a></li>
+                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
+                    <li><a href="train_cnn.html">train CNN model</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_gen.html">saliency generation</a>
+                <ul>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_eval.html">saliency evaluation</a>
+                <ul>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
+                </ul>
+            </li>
+            <li><a href="analysis.html">analysis</a></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Faithfulness Evaluation</h1>
+            <p>This script computes the faithfulness measure for saliency scores in machine learning models, evaluating how well saliency methods align with model predictions.</p>
+        </header>
+
+        <div class="section" id="overview">
+            <h2>Overview</h2>
+            <p>
+                This script evaluates the faithfulness of saliency scores by comparing the model's prediction to the saliency scores for different thresholds. The faithfulness measure is computed using various saliency methods like SHAP, LIME, and others. The evaluation process involves calculating the Area Under the Curve (AUC) for each saliency method at multiple threshold values.
+            </p>
+            <p>The script performs the following tasks:</p>
+            <ul>
+                <li>Loads trained models from specified directories.</li>
+                <li>Processes test data and saliency maps for each model.</li>
+                <li>Evaluates faithfulness using AUC scores for different saliency methods.</li>
+                <li>Writes the results, including mean and standard deviation of AUC scores, to output files.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="usage">
+            <h2>Usage</h2>
+            <p>To run the script, execute the following command:</p>
+            <pre><code>python -m saliency_eval.faithfulness</code></pre>
+            <p>Modify the <code>args</code> dictionary to customize the directories, model paths, and saliency methods for evaluation.</p>
+            <h3>Key Features:</h3>
+            <ul>
+                <li>Evaluates the faithfulness of saliency methods using AUC scores.</li>
+                <li>Supports various saliency methods, including SHAP, LIME, and others.</li>
+                <li>Evaluates models on datasets like SNLI using thresholded saliency values.</li>
+                <li>Saves results to output files with mean and standard deviation of AUC scores.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="functions">
+            <h2>Functions</h2>
+
+            <h3><code>get_model</code></h3>
+            <p>Loads a trained model from a specified checkpoint path and returns the model and its configuration.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>model_path</code>: Path to the model checkpoint.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>The loaded model and its configuration.</p>
+        </div>
+
+        <div class="section" id="parameters">
+            <h2>Parameters</h2>
+            <p>Key parameters in the <code>args</code> dictionary:</p>
+            <ul>
+                <li><strong>gpu</strong>: Whether to use GPU for evaluation (True/False).</li>
+                <li><strong>saliency</strong>: List of saliency methods to evaluate (e.g., "rand", "shap", "lime").</li>
+                <li><strong>dataset</strong>: Dataset to use for evaluation (e.g., "snli").</li>
+                <li><strong>dataset_dir</strong>: Directory containing the dataset.</li>
+                <li><strong>test_saliency_dir</strong>: Directories containing the test saliency maps.</li>
+                <li><strong>model_path</strong>: Paths to the trained models.</li>
+                <li><strong>models_dir</strong>: Directories containing the models.</li>
+                <li><strong>output_dir</strong>: Directory to save evaluation results.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="evaluation">
+            <h2>Evaluation</h2>
+            <p>The script evaluates the faithfulness of saliency maps by computing the Area Under the Curve (AUC) for each saliency method at different thresholds. The AUC scores are used as a measure of how well the saliency scores align with the model’s predictions.</p>
+            <p>Results, including the mean and standard deviation of AUC scores across thresholds, are saved to output files for further analysis.</p>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>

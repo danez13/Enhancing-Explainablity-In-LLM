@@ -20,11 +20,9 @@ Functions:
 - generate_saliency: Generates saliency maps and saves them to disk.
 """
 
-import argparse
 import json
 import os
 import random
-from argparse import Namespace
 from collections import defaultdict
 from functools import partial
 
@@ -207,40 +205,40 @@ args = {
     "saliency": ["guided", "sal", "inputx", "occlusion"],  
     "batch_size": None  
 }
+if __name__ == "__main__":
+    random.seed(args["seed"])
+    torch.manual_seed(args["seed"])
+    torch.cuda.manual_seed_all(args["seed"])
+    torch.backends.cudnn.deterministic = True
+    np.random.seed(args["seed"])
 
-random.seed(args["seed"])
-torch.manual_seed(args["seed"])
-torch.cuda.manual_seed_all(args["seed"])
-torch.backends.cudnn.deterministic = True
-np.random.seed(args["seed"])
+    device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-device = torch.device("cuda") if args["gpu"] else torch.device("cpu")
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    for saliency in args["saliency"]:
+        print('Running Saliency ', saliency, flush=True)
 
-for saliency in args["saliency"]:
-    print('Running Saliency ', saliency, flush=True)
+        if saliency in ['guided', 'sal', 'inputx', 'deeplift']:
+            aggregations = ['mean', 'l2']
+        else:
+            aggregations = ['none']
 
-    if saliency in ['guided', 'sal', 'inputx', 'deeplift']:
-        aggregations = ['mean', 'l2']
-    else:
-        aggregations = ['none']
+        for aggregation in aggregations:
+            flops = []
+            print('Running aggregation ', aggregation, flush=True)
 
-    for aggregation in aggregations:
-        flops = []
-        print('Running aggregation ', aggregation, flush=True)
+            for models_dir, output_dir in zip(args["models_dir"], args["output_dir"]):
+                base_model_name = models_dir.split('/')[-1]
+                for model in range(1, 6):
+                    curr_flops = generate_saliency(
+                        os.path.join(models_dir + f'_{model}'),
+                        os.path.join(output_dir, f'{base_model_name}_{model}_{saliency}_{aggregation}'),
+                        saliency,
+                        aggregation)
 
-        for models_dir, output_dir in zip(args["models_dir"], args["output_dir"]):
-            base_model_name = models_dir.split('/')[-1]
-            for model in range(1, 6):
-                curr_flops = generate_saliency(
-                    os.path.join(models_dir + f'_{model}'),
-                    os.path.join(output_dir, f'{base_model_name}_{model}_{saliency}_{aggregation}'),
-                    saliency,
-                    aggregation)
+                    flops.append(np.average(curr_flops))
 
-                flops.append(np.average(curr_flops))
-
-            print('FLOPS', np.average(flops), np.std(flops), flush=True)
-            print()
-            print()
+                print('FLOPS', np.average(flops), np.std(flops), flush=True)
+                print()
+                print()
 

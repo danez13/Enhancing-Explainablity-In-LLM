@@ -50,23 +50,24 @@
             </div>
         </nav>
         <div class="container">
-            <h1>Model Module</h1>
+            <h1>saliency generation Module</h1>
             <p>
-                This section provides detailed insights, code explanations, usage, and instructions for various components of the models module
+                This section provides detailed insights, code explanations, usage, and instructions for various components for the saliency generation Module
             </p>
     
-            <h2>Module Overview</h2>
+            <h2>Overview of the Module</h2>
             <p>
-                the model module encompasses multiple sections that in include data handling, model utilities, saliency utilities, and model training
+                the model module encompasses multiple sections that provides detailed explainations of the XAI metrics used in the Project.
+                A variety of different metrics was used including gradient salency, occlusion, lime, shap, and random saliency generation
             </p>
     
             <h2>Sections Covered</h2>
             <div class="sections">
                 <ul>
-                    <li><b>dataset loading</b> custom datasets, samplers, and collate functions for natural language inference (NLI) models.</li>
-                    <li><b>model building:</b> training utilities</li>
-                    <li><b>saliency Utilities:</b> extracting saliency scores for tokens in the ESNLI dataset</li>
-                    <li><b>CNN model training:</b> training Convolutional Neural Networks (CNN) models on the e-SNLI dataset</li>
+                    <li><b>random saliency generation:</b> a deep explaination of the random saliency generation module</li>
+                    <li><b>gradient and occlusion:</b> A deep dive into the gradiant and occlusion saliency generation</li>
+                    <li><b>lime:</b> an explantion of the lime value generation</li>
+                    <li><b>shap:</b> an explantion of the shap value generation</li>
                 </ul>
             </div>
             <h2>Getting Started</h2>
@@ -75,10 +76,10 @@
             </p>
             <div class="navigation">
                 <ul>
-                    <li><a href="data_loader.html">load dataset</a></li>
-                    <li><a href="model_builder.html">build model</a></li>
-                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
-                    <li><a href="train_cnn.html">train CNN model</a></li>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
                 </ul>
             </div>
         </div>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for evaluating consistency rationale measure between model activations and saliency maps across CNN layers.">
+    <title>Consistency Evaluation Documentation</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prereqs.html">prerequisites</a></li>
+            <li>
+                <a href="model.html">model</a>
+                <ul>
+                    <li><a href="data_loader.html">load dataset</a></li>
+                    <li><a href="model_builder.html">build model</a></li>
+                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
+                    <li><a href="train_cnn.html">train CNN model</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_gen.html">saliency generation</a>
+                <ul>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_eval.html">saliency evaluation</a>
+                <ul>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
+                </ul>
+            </li>
+            <li><a href="analysis.html">analysis</a></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Rational Consistency Evaluation</h1>
+            <p>This script evaluates the consistency between model activations and saliency measures across different layers of a CNN model. It computes Spearman rank correlation between normalized differences in activations and saliency scores.</p>
+        </header>
+
+        <div class="section" id="overview">
+            <h2>Overview</h2>
+            <p>
+                This script evaluates the consistency of model activations and saliency scores in a CNN model. It computes the Spearman rank correlation between activation differences and saliency differences across different layers of the model. The analysis helps assess the stability of model explanations across various saliency techniques.
+            </p>
+            <p>The script performs the following tasks:</p>
+            <ul>
+                <li>Loads model checkpoints and saliency maps.</li>
+                <li>Computes the difference in activations and saliency scores for each instance.</li>
+                <li>Calculates Spearman rank correlation to evaluate consistency.</li>
+                <li>Normalizes and scales the feature differences.</li>
+                <li>Provides results per layer or aggregated consistency.</li>
+                <li>Saves the evaluation results to output files for further analysis.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="usage">
+            <h2>Usage</h2>
+            <p>To run the script, execute the following command:</p>
+            <pre><code>python -m saliency_eval.consistency_rats</code></pre>
+            <p>Modify the <code>args</code> dictionary to customize the directories, models, and other settings.</p>
+            <h3>Key Features:</h3>
+            <ul>
+                <li>Evaluates model consistency using saliency-based features.</li>
+                <li>Supports multiple saliency methods such as SHAP, LIME, and others.</li>
+                <li>Can evaluate consistency per layer or in an aggregated manner.</li>
+                <li>Calculates Spearman rank correlation for consistency analysis.</li>
+                <li>Saves evaluation results including consistency scores to output files.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="functions">
+            <h2>Functions</h2>
+
+            <h3><code>get_model</code></h3>
+            <p>Loads the model from a checkpoint file.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>model_path</code>: Path to the model checkpoint.</li>
+                <li><code>device</code>: Device to load the model (CPU or GPU).</li>
+                <li><code>model_type</code>: Type of the model (e.g., CNN).</li>
+                <li><code>tokenizer</code>: Tokenizer for text preprocessing.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>The loaded model and its arguments.</p>
+
+            <h3><code>get_saliencies</code></h3>
+            <p>Loads saliency maps from a file.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>saliency_path</code>: Path to the saliency file.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>A list of token-level saliency scores for each instance.</p>
+
+            <h3><code>get_layer_names</code></h3>
+            <p>Returns the names of the layers in the CNN model.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>model</code>: The CNN model name.</li>
+                <li><code>dataset</code>: The dataset name.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>A list of layer names.</p>
+
+            <h3><code>get_sal_dist</code></h3>
+            <p>Computes the mean absolute difference between two saliency maps.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>sal1</code>: Saliency scores from the first model.</li>
+                <li><code>sal2</code>: Saliency scores from the second model.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>A floating-point value representing the mean absolute difference between the two saliency maps.</p>
+        </div>
+
+        <div class="section" id="parameters">
+            <h2>Parameters</h2>
+            <p>Key parameters in the <code>args</code> dictionary:</p>
+            <ul>
+                <li><strong>model_dir_trained</strong>: Directory containing trained models.</li>
+                <li><strong>model_dir_random</strong>: Directory containing random models.</li>
+                <li><strong>output_dir</strong>: Directory to save the evaluation results.</li>
+                <li><strong>saliency_dir_trained</strong>: Directory containing saliency maps for trained models.</li>
+                <li><strong>saliency_dir_random</strong>: Directory containing saliency maps for random models.</li>
+                <li><strong>saliencies</strong>: List of saliency methods to evaluate (e.g., "shap", "lime").</li>
+                <li><strong>gpu</strong>: Boolean indicating whether to use GPU.</li>
+                <li><strong>dataset</strong>: Dataset to use (e.g., "snli").</li>
+                <li><strong>per_layer</strong>: Boolean indicating whether to evaluate per-layer consistency.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="evaluation">
+            <h2>Evaluation</h2>
+            <p>The script evaluates the consistency of saliency maps and activations using Spearman rank correlation:</p>
+            <ul>
+                <li><strong>Spearman Rank Correlation</strong>: Measures the monotonic relationship between activation differences and saliency differences.</li>
+            </ul>
+            <p>Results are saved to files containing the consistency scores for further analysis.</p>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>

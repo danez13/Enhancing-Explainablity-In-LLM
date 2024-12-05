@@ -144,7 +144,9 @@ nav ul li:hover > ul {
 body .container {
     padding:1%;
 }
-
+body div .navigation{
+    border:2px solid #d9d9de;;
+}
 body div .navigation ul{
     border-radius: 5px;
     text-decoration: none;
@@ -153,6 +155,7 @@ body div .navigation ul{
     margin: 0;
     padding: 0;
     display: flex;
+    flex-wrap: wrap;
 }
 body div .navigation ul li {
     display: flex;
@@ -173,13 +176,13 @@ body div .navigation ul li a:hover {
 /* index */
 /*  */
 code {
-    background-color: #f4f4f4;
+    background-color: #f4f4f9;
     padding: 2px 4px;
     border-radius: 4px;
     font-size: 1rem;
 }
 pre {
-    background-color: #f4f4f4;
+    background-color: #f4f4f9;
     padding: 10px;
     border-radius: 4px;
     overflow: auto;
@@ -189,4 +192,24 @@ pre {
 }
 .parameters {
     margin-left: 20px;
+}
+
+.graph-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+.graph-item {
+    text-align: center;
+}
+.graph-item img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+}
+.graph-item h3 {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
 }

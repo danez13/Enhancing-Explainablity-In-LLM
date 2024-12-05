@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for computing Human Agreement measure in machine learning saliency evaluation.">
+    <title>Human Agreement Measure Evaluation Documentation</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prereqs.html">prerequisites</a></li>
+            <li>
+                <a href="model.html">model</a>
+                <ul>
+                    <li><a href="data_loader.html">load dataset</a></li>
+                    <li><a href="model_builder.html">build model</a></li>
+                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
+                    <li><a href="train_cnn.html">train CNN model</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_gen.html">saliency generation</a>
+                <ul>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_eval.html">saliency evaluation</a>
+                <ul>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
+                </ul>
+            </li>
+            <li><a href="analysis.html">analysis</a></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Human Agreement Measure Evaluation</h1>
+            <p>This script evaluates the Human Agreement measure for saliency methods applied to the SNLI dataset.</p>
+        </header>
+
+        <div class="section" id="overview">
+            <h2>Overview</h2>
+            <p>
+                This script computes the Human Agreement measure by comparing the saliency values of predicted and gold labels in the SNLI dataset. It evaluates multiple saliency methods, such as SHAP, LIME, and others, by calculating the average precision score between gold saliency and the predicted saliency values for each instance.
+            </p>
+            <p>The script performs the following tasks:</p>
+            <ul>
+                <li>Loads the e-SNLI dataset and model predictions.</li>
+                <li>Iterates over different saliency methods and seeds.</li>
+                <li>Calculates average precision for each instance.</li>
+                <li>Saves the results with mean and standard deviation of average precision scores for each saliency method.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="usage">
+            <h2>Usage</h2>
+            <p>To run the script, execute the following command:</p>
+            <pre><code>python -m saliency_eval.human_agreement</code></pre>
+            <p>Modify the <code>args</code> dictionary to customize dataset paths, saliency methods, and output directories.</p>
+            <h3>Key Features:</h3>
+            <ul>
+                <li>Evaluates Human Agreement measure using average precision score.</li>
+                <li>Supports various saliency methods, including SHAP, LIME, and random saliency.</li>
+                <li>Handles multiple seeds for robust evaluation.</li>
+                <li>Saves evaluation results to output files with mean and standard deviation.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="parameters">
+            <h2>Parameters</h2>
+            <p>Key parameters in the <code>args</code> dictionary:</p>
+            <ul>
+                <li><strong>subset</strong>: Subset of data to use ('all' for the full dataset).</li>
+                <li><strong>dataset</strong>: The dataset to evaluate ('snli' in this case).</li>
+                <li><strong>dataset_dir</strong>: Path to the dataset directory.</li>
+                <li><strong>saliency_path</strong>: List of directories containing saliency files for different models.</li>
+                <li><strong>saliencies</strong>: List of saliency methods to evaluate.</li>
+                <li><strong>output_dir</strong>: Directories to save the evaluation results.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="evaluation">
+            <h2>Evaluation</h2>
+            <p>The script evaluates the Human Agreement measure for each saliency method by calculating the average precision score between the predicted and gold saliency values for each instance. The evaluation results include:</p>
+            <ul>
+                <li><strong>Average Precision Score (AP)</strong>: Measures how well the predicted saliency matches the gold saliency.</li>
+                <li><strong>Mean and Standard Deviation</strong>: The mean and standard deviation of the scores across all instances for each saliency method.</li>
+            </ul>
+            <p>Results are saved to files in the output directories specified in the <code>args</code> dictionary.</p>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>

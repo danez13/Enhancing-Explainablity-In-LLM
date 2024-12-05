@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for generating and serializing saliency maps using various attribution methods.">
+    <title>Saliency Map Generation Documentation</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prereqs.html">prerequisites</a></li>
+            <li>
+                <a href="model.html">model</a>
+                <ul>
+                    <li><a href="data_loader.html">load dataset</a></li>
+                    <li><a href="model_builder.html">build model</a></li>
+                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
+                    <li><a href="train_cnn.html">train CNN model</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_gen.html">saliency generation</a>
+                <ul>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_eval.html">saliency evaluation</a>
+                <ul>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
+                </ul>
+            </li>
+            <li><a href="analysis.html">analysis</a></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Gradient and occlusion Saliency generation</h1>
+            <p>This script generates and serializes saliency maps using various attribution methods, including gradient-based approaches and occlusion.</p>
+        </header>
+
+        <div class="section" id="overview">
+            <h2>Overview</h2>
+            <p>
+                This script provides saliency attribution maps for CNN models trained on datasets such as e-SNLI. 
+                It supports methods including Guided Backprop, DeepLift, Saliency, InputXGradient, and Occlusion.
+            </p>
+            <p>The script performs the following tasks:</p>
+            <ul>
+                <li>Loads a trained model and dataset.</li>
+                <li>Generates saliency maps using specified attribution methods.</li>
+                <li>Summarizes saliency maps based on aggregation techniques (e.g., mean, L2 norm).</li>
+                <li>Serializes results to disk for further analysis.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="usage">
+            <h2>Usage</h2>
+            <p>Run the script to generate saliency maps with a specific method and aggregation:</p>
+            <pre><code>python -m saliency_gen.interpret_grads_occ</code></pre>
+            <p>Modify parameters in the <code>args</code> dictionary to customize execution.</p>
+            <h3>Key Features:</h3>
+            <ul>
+                <li>Supports multiple attribution methods and aggregation types.</li>
+                <li>Handles batching for efficiency during saliency map generation.</li>
+                <li>Serializes output in JSON format for downstream tasks.</li>
+                <li>Ensures reproducibility with a fixed random seed.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="functions">
+            <h2>Functions</h2>
+
+            <h3><code>summarize_attributions</code></h3>
+            <p>Summarizes saliency attribution maps using specified techniques.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>attributions</code>: Attribution values to summarize.</li>
+                <li><code>type</code>: Summarization type ('mean', 'dot', 'l2', 'none').</li>
+                <li><code>model</code>: Model to extract embeddings (optional).</li>
+                <li><code>tokens</code>: Tokenized input for embedding lookup (optional).</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>Summarized attribution values.</p>
+
+            <h3><code>generate_saliency</code></h3>
+            <p>Generates and saves saliency maps using a specified method and aggregation.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>model_path</code>: Path to the trained model checkpoint.</li>
+                <li><code>saliency_path</code>: Path to save the saliency maps.</li>
+                <li><code>saliency</code>: Attribution method ('guided', 'occlusion', etc.).</li>
+                <li><code>aggregation</code>: Aggregation type ('mean', 'l2', 'none').</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>List of average FLOPS (floating point operations per second) for each batch.</p>
+
+            <h3><code>get_model_embedding_emb</code></h3>
+            <p>Retrieves the embedding layer from the model.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>model</code>: The PyTorch model from which to extract the embedding layer.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>The embedding layer of the model as a <code>torch.nn.Module</code>.</p>
+        </div>
+
+        <div class="section" id="classes">
+            <h2>Classes</h2>
+
+            <h3><code>BertModelWrapper</code></h3>
+            <p>A wrapper class for BERT-based models to extract embeddings.</p>
+            <h4>Attributes:</h4>
+            <ul>
+                <li><code>model</code>: The pre-trained BERT model.</li>
+            </ul>
+            <h4>Methods:</h4>
+            <ul>
+                <li><code>forward(input, attention_mask, labels)</code>: 
+                    Passes input through the model and returns embeddings.
+                </li>
+            </ul>
+        </div>
+
+        <div class="section" id="parameters">
+            <h2>Parameters</h2>
+            <p>Key parameters in the <code>args</code> dictionary:</p>
+            <ul>
+                <li><strong>dataset</strong>: Dataset name (e.g., "snli").</li>
+                <li><strong>models_dir</strong>: Directories of trained models.</li>
+                <li><strong>output_dir</strong>: Paths to save saliency outputs.</li>
+                <li><strong>gpu</strong>: Whether to use GPU for computation.</li>
+                <li><strong>batch_size</strong>: Batch size for processing (default: model-specific).</li>
+                <li><strong>saliency</strong>: List of saliency methods to use.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="evaluation">
+            <h2>Evaluation</h2>
+            <p>The script tracks the computational cost of saliency generation, reporting average FLOPS (Floating Point Operations Per Second) per batch.</p>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for model activation comparison and analysis.">
+    <title>Model Activation Comparison Documentation</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prereqs.html">prerequisites</a></li>
+            <li>
+                <a href="model.html">model</a>
+                <ul>
+                    <li><a href="data_loader.html">load dataset</a></li>
+                    <li><a href="model_builder.html">build model</a></li>
+                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
+                    <li><a href="train_cnn.html">train CNN model</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_gen.html">saliency generation</a>
+                <ul>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_eval.html">saliency evaluation</a>
+                <ul>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
+                </ul>
+            </li>
+            <li><a href="analysis.html">analysis</a></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Rational Consistency Precomputation</h1>
+            <p>This script compares activations from different models, computing the differences across specific layers in a given input instance.</p>
+        </header>
+
+        <div class="section" id="overview">
+            <h2>Overview</h2>
+            <p>
+                This script loads two models and compares their activations on a given test dataset. It computes the difference in activations between the two models across specified layers and outputs the differences for further analysis.
+            </p>
+            <p>The script performs the following tasks:</p>
+            <ul>
+                <li>Loads two models from specified directories.</li>
+                <li>Extracts activations from specified layers in the models.</li>
+                <li>Computes the difference in activations between the two models.</li>
+                <li>Stores the activation differences in an output file for further analysis.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="usage">
+            <h2>Usage</h2>
+            <p>To run the script, execute the following command:</p>
+            <pre><code>python -m saliency_eval.consistency_precompute</code></pre>
+            <p>Modify the configuration dictionary to customize the paths for models and datasets.</p>
+            <h3>Key Features:</h3>
+            <ul>
+                <li>Compares activations between two models across specific layers.</li>
+                <li>Supports multiple comparison modes: trained vs trained, random vs trained.</li>
+                <li>Computes activation differences and saves them for further analysis.</li>
+                <li>Can be customized for different datasets and models.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="functions">
+            <h2>Functions</h2>
+
+            <h3><code>get_model</code></h3>
+            <p>Loads a model from the checkpoint and initializes it with corresponding parameters.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>model_path</code>: Path to the model checkpoint.</li>
+                <li><code>device</code>: The device (CPU or GPU) to load the model onto.</li>
+                <li><code>tokenizer</code>: The tokenizer used for text processing.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>A tuple containing the loaded model and its arguments.</p>
+
+            <h3><code>save_activation</code></h3>
+            <p>Hook function to save the activations from a specific layer during a forward pass.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>self</code>: The layer where the hook is registered.</li>
+                <li><code>inp</code>: The input to the layer.</li>
+                <li><code>out</code>: The output of the layer.</li>
+            </ul>
+
+            <h3><code>get_layer_activation</code></h3>
+            <p>Computes the activations of a specific layer in the model for a given input instance.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>layer</code>: Name of the layer to extract activations from.</li>
+                <li><code>model</code>: The model containing the layer.</li>
+                <li><code>instance</code>: A single data instance from the dataset.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>A flattened list of activations from the specified layer.</p>
+
+            <h3><code>get_model_dist</code></h3>
+            <p>Computes the difference in activations between two models for a given input across specified layers.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>model1</code>: The first model.</li>
+                <li><code>model2</code>: The second model.</li>
+                <li><code>x</code>: The input instance.</li>
+                <li><code>layers</code>: List of layer names to evaluate.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>A list of activation differences for each specified layer.</p>
+
+            <h3><code>get_layer_names</code></h3>
+            <p>Returns the list of layer names for the CNN model.</p>
+            <h4>Returns:</h4>
+            <p>A list of CNN model layer names.</p>
+        </div>
+
+        <div class="section" id="parameters">
+            <h2>Parameters</h2>
+            <p>Key parameters in the script:</p>
+            <ul>
+                <li><strong>model_dir_trained</strong>: Directory containing trained models.</li>
+                <li><strong>model_dir_random</strong>: Directory containing random models for comparison.</li>
+                <li><strong>output_dir</strong>: Directory to save the evaluation results.</li>
+                <li><strong>dataset_dir</strong>: Directory containing the dataset for evaluation.</li>
+                <li><strong>gpu</strong>: Boolean flag to use GPU for computation.</li>
+                <li><strong>model_p</strong>: Mode for model comparison ("not", "rand").</li>
+                <li><strong>seed</strong>: Seed for reproducibility.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="evaluation">
+            <h2>Evaluation</h2>
+            <p>The script evaluates the difference in activations between two models across specific layers. The computed differences are saved to an output file for further analysis.</p>
+            <p>Results are saved in the output directory, including the activation differences for each instance in the test dataset.</p>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>
