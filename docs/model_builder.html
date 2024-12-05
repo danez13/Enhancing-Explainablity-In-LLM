@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Utilities Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prereqs.html">prerequisites</a></li>
+            <li>
+                <a href="model.html">model</a>
+                <ul>
+                    <li><a href="data_loader.html">load dataset</a></li>
+                    <li><a href="model_builder.html">build model</a></li>
+                    <li><a href="saliency_utils.html">model saliency utilities</a></li>
+                    <li><a href="train_cnn.html">train CNN model</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_gen.html">saliency generation</a>
+                <ul>
+                    <li><a href="generate_random_sal.html">generate random saliency values</a></li>
+                    <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
+                    <li><a href="interpret_lime.html">generate lime values</a></li>
+                    <li><a href="interpret_shap.html">generate shap values</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="saliency_eval.html">saliency evaluation</a>
+                <ul>
+                    <li><a href="confidence.html">confidence</a></li>
+                    <li><a href="faithfulness.html">faithfulness</a></li>
+                    <li><a href="human_agreement.html">human agreement</a></li>
+                    <li><a href="consistency_precompute.html">precompute consistency</a></li>
+                    <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
+                    <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
+                    <li><a href="consist_data.html">data consistency</a></li>
+                </ul>
+            </li>
+            <li><a href="analysis.html">analysis</a></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>model building</h1>
+        <p>This module provides utilities for training machine learning models, including early stopping, embedding management, and a CNN model for text classification.</p>
+
+        <div class="section">
+            <h2>Functions</h2>
+
+            <h3><code>_get_glove_embeddings</code></h3>
+            <p>Loads GloVe embeddings and maps words to indices and vectors.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>embedding_dim</code>: int - Dimension of GloVe embeddings (e.g., 50, 100).</li>
+                <li><code>glove_dir</code>: str - Directory path for GloVe files.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>Tuple[Dict[str, int], List[np.array]] - A dictionary mapping words to indices and a list of word vectors.</p>
+
+            <h3><code>get_embeddings</code></h3>
+            <p>Constructs an embedding matrix using GloVe embeddings and the tokenizer's vocabulary.</p>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>embedding_dim</code>: int - Dimension of embeddings.</li>
+                <li><code>embedding_dir</code>: str - Directory containing GloVe embeddings.</li>
+                <li><code>tokenizer</code>: <code>PreTrainedTokenizer</code> - Tokenizer for mapping words to tokens.</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p><code>torch.nn.Parameter</code> - A learnable embedding matrix tensor.</p>
+        </div>
+
+        <div class="section">
+            <h2>Classes</h2>
+
+            <h3><code>EarlyStopping</code></h3>
+            <p>Implements early stopping to prevent overfitting during training.</p>
+            <h4>Attributes:</h4>
+            <ul>
+                <li><code>mode</code>: str - Metric optimization mode ('min' or 'max').</li>
+                <li><code>min_delta</code>: float - Minimum change to qualify as improvement.</li>
+                <li><code>patience</code>: int - Epochs to wait for improvement before stopping.</li>
+                <li><code>percentage</code>: bool - Whether <code>min_delta</code> is a percentage.</li>
+            </ul>
+            <h4>Methods:</h4>
+            <ul>
+                <li><code>__init__(mode, min_delta, patience, percentage)</code>: Initializes the stopping criteria.</li>
+                <li><code>step(metrics)</code>: Updates criteria based on current metric value.</li>
+            </ul>
+
+            <h3><code>CNN_MODEL</code></h3>
+            <p>A CNN for text classification using pre-trained embeddings.</p>
+            <h4>Attributes:</h4>
+            <ul>
+                <li><code>embedding</code>: <code>torch.nn.Embedding</code> - Embedding layer with pre-trained embeddings.</li>
+                <li><code>conv_layers</code>: <code>torch.nn.ModuleList</code> - Convolutional layers for feature extraction.</li>
+                <li><code>final</code>: <code>torch.nn.Linear</code> - Fully connected layer for classification.</li>
+            </ul>
+            <h4>Methods:</h4>
+            <ul>
+                <li><code>__init__(tokenizer, args, n_labels)</code>: Initializes the model architecture.</li>
+                <li><code>conv_block(input, conv_layer)</code>: Convolution block with activation and pooling.</li>
+                <li><code>forward(input)</code>: Forward pass through the network.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
