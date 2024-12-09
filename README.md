@@ -1,6 +1,5 @@
 # CAP-XAI
-## documentation
-https://danez13.github.io/CAP-XAI/
+## [documentation](https://danez13.github.io/CAP-XAI/)
 ## Prerequisites
 1. python 11.0
 2. install the requirements
