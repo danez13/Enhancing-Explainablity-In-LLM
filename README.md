@@ -1,19 +1,20 @@
 # CAP-XAI
 ## Directory Structure
 The code is broken up into various directories
-* Enhancing Explainability in LLM
+* **Enhancing Explainability in LLM**
     * This overarching directory that contains the entire project
-* data: a directory containing data that is used across the entire project in various modules
-    * analysis: contains graphs and visuals for results of the project
-    * e-SNLI: The dataset used across the entire project
-    * evaluations: the data from the evaluation criteria from which the model was analysed
-    * models: data containing model parameters and predictions
-    * saliency: data containg generated saliency values from every XAI metric
-* eval_analysis: contains analysis script that visualizes the evaluation criteria
-* models: contains scripts and functions for data handling, model construction, saliency utilities, and model training
-* saliency_eval: contains scripts and functions for evaluation the generated XAI metrics based on the criteria
-* saliency_gen: contains scripts and functions for generating the XAI metric values based on the model predictions
-* WebSite: contains HTML, CSS, and javascript code for generating a documentation website that explains the code is detail
+* **data**: a directory containing data that is used across the entire project in various modules
+    * **analysis**: contains graphs and visuals for results of the project
+    * **e-SNLI**: The dataset used across the entire project
+    * **evaluations**: the data from the evaluation criteria from which the model was analysed
+    * **models**: data containing model parameters and predictions
+    * **saliency**: data containg generated saliency values from every XAI metric
+* **eval_analysis**: contains analysis script that visualizes the evaluation criteria
+* **models**: contains scripts and functions for data handling, model construction, saliency utilities, and model training
+* **saliency_eval**: contains scripts and functions for evaluation the generated XAI metrics based on the criteria
+* **saliency_gen**: contains scripts and functions for generating the XAI metric values based on the model predictions
+* **WebSite**: contains HTML, CSS, and javascript code for generating a documentation website that explains the code is detail
+
 ## User Manual
 ### Prerequisites
 1. python 11.0
