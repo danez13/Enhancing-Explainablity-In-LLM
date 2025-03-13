@@ -1,91 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentation Overview</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-    <body>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="prereqs.html">prerequisites</a></li>
-                <li>
-                    <a href="model.html">model</a>
-                    <ul>
-                        <li><a href="data_loader.html">load dataset</a></li>
-                        <li><a href="model_builder.html">build model</a></li>
-                        <li><a href="saliency_utils.html">model saliency utilities</a></li>
-                        <li><a href="train_cnn.html">train CNN model</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="saliency_gen.html">saliency generation</a>
-                    <ul>
-                        <li><a href="generate_random_sal.html">generate random saliency values</a></li>
-                        <li><a href="interpret_grads_occ.html">generate gradient and occlusion saliency values</a></li>
-                        <li><a href="interpret_lime.html">generate lime values</a></li>
-                        <li><a href="interpret_shap.html">generate shap values</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="saliency_eval.html">saliency evaluation</a>
-                    <ul>
-                        <li><a href="confidence.html">confidence</a></li>
-                        <li><a href="faithfulness.html">faithfulness</a></li>
-                        <li><a href="human_agreement.html">human agreement</a></li>
-                        <li><a href="consistency_precompute.html">precompute consistency</a></li>
-                        <li><a href="consistency_rats.html">evaluate rational consistency</a></li>
-                        <li><a href="consist_data_samples.html">consistent data sample pairs</a></li>
-                        <li><a href="consist_data.html">data consistency</a></li>
-                    </ul>
-                </li>
-                <li><a href="analysis.html">analysis</a></li>
-            </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </nav>
-        <div class="container">
-            <h1>Welcome to the Documentation Hub</h1>
-            <p>
-                This documentation hub provides detailed insights, code explanations, and usage instructions
-                for various components and utilities in our project.
-            </p>
-    
-            <h2>Overview of the Documentation</h2>
-            <p>
-                The documentation is divided into multiple sections, each focusing on a specific component
-                or aspect of the project.
-            </p>
-    
-            <h2>Sections Covered</h2>
-            <div class="sections">
-                <ul>
-                    <li><b>prerequisites:</b> an overview of the prerequisites including what python version and what libraries to install</li>
-                    <li><b>model:</b> A deep dive into the model creation, utils, data loading and training</li>
-                    <li><b>saliency generation:</b> a deep dive into generation of saliency metrics</li>
-                    <li><b>saliency evaluation:</b> a deep dive into evaluation of saliency and model based on the criteria</li>
-                    <li><b>evaluation analysis:</b> analysis of model and metrics for each evaluation criteria</li>
-                </ul>
-            </div>
-            <h2>Getting Started</h2>
-            <p>
-                To begin, select a section that matches your needs from the navigation menu or use the links below:
-            </p>
-            <div class="navigation">
-                <ul>
-                    <li><a href="prereqs.html">prerequisites</a></li>
-                    <li><a href="model.html">model</a></li>
-                    <li><a href="saliency_gen.html">saliency generation</a></li>
-                    <li><a href="saliency_eval.html">saliency evaluation</a></li>
-                    <li><a href="analysis.html">analysis</a></li>
-                </ul>
-            </div>
-        </div>
-        <script src="script.js"></script>
-    </body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="./clover.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documentation</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/docs.jsx"></script>
+  </body>
 </html>

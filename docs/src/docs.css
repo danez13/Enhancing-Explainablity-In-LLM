@@ -1,0 +1,9 @@
+body {
+    background-color: rgb(34,34,34);
+}
+
+.content{
+    display: flex;
+    margin-left: 15px;
+    margin-right: 15px;
+}

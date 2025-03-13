@@ -1,0 +1,50 @@
+.Topbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.Topbar select{
+    color: whitesmoke;
+    background-color: rgb(51,51,51);
+}
+
+.Topbar #left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.Topbar #left p a{
+    text-decoration: none;
+    color: whitesmoke
+}
+
+.Topbar #left a {
+    width: fit-content;
+    height: 20px;
+    width:20px;
+}
+
+.Topbar #left a img{
+    width: 100%;
+    height: 100%
+}
+
+.Topbar #right {
+    display: flex;
+    align-items: center;
+    gap:10px;
+}
+
+.Topbar #right p{
+    color: whitesmoke
+}
+
+.Topbar #right p a{
+    text-decoration: none;
+    color: whitesmoke
+}

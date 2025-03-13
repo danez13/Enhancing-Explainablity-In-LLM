@@ -80,6 +80,7 @@ def eval_model(model: torch.nn.Module, test_dl: BucketBatchSampler,
         losses = []
         for batch in tqdm(test_dl, desc="Evaluation"):  # Loop through batches in the dataset
             logits_val = model(batch[0])  # Forward pass through the model
+            
             loss_val = loss_f(logits_val, batch[1])  # Calculate the loss
             losses.append(loss_val.item())  # Record the loss for averaging
 
@@ -123,7 +124,7 @@ if __name__ == "__main__":
             "embedding_dim":300,  # Word embedding dimension
             "in_channels":1,  # Input channels for CNN
             "out_channels": 300,  # Output channels for CNN
-            "kernel_heights": [4,5,6,7],  # Kernel heights for convolution layers
+            "kernel_size": [4,5,6,7],  # Kernel heights for convolution layers
             "stride":1,  # Stride for convolution layers
             "padding":0  # Padding for convolution layers
         }

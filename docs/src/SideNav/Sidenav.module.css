@@ -1,0 +1,35 @@
+.nav {
+    min-width: 190px;
+    height: 100vh;
+    background-color: rgb(51,51,51);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.nav h2 {
+    text-align: center;
+}
+
+.nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.nav ul li {
+    margin: 0;
+    padding: 0;
+}
+
+.nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    display: block;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.nav ul li a:hover {
+    background-color: #345e49;
+}
